@@ -1281,6 +1281,9 @@
       <div class="settings-tabs">
         <div class="tab active" data-settings-tab="stores">Stores</div>
         <div class="tab" data-settings-tab="users">Users</div>
+        <div class="tab" data-settings-tab="admin">Admin & Security</div>
+        <div class="tab" data-settings-tab="email">Email Rules</div>
+        <div class="tab" data-settings-tab="log">Activity Log</div>
         <div class="tab" data-settings-tab="danger">Data</div>
       </div>
 
@@ -1298,6 +1301,81 @@
           <button class="btn btn-primary" onclick="openUserEditor()">+ Add User</button>
         </div>
         <div id="userList"></div>
+      </div>
+
+      <!-- ADMIN & SECURITY -->
+      <div class="settings-pane" id="settings-admin">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Access PINs</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Control who can sign into Ted's Hub. The Team PIN grants standard access; the Admin PIN grants full admin control. Change these anytime.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="form-group">
+              <label>Team PIN <span style="color:var(--ted-muted);font-weight:400">(4 digits)</span></label>
+              <input type="text" id="cfgTeamPin" maxlength="4" pattern="[0-9]{4}">
+            </div>
+            <div class="form-group">
+              <label>Admin PIN <span style="color:var(--ted-muted);font-weight:400">(4 digits)</span></label>
+              <input type="text" id="cfgAdminPin" maxlength="4" pattern="[0-9]{4}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Required Email Domain</label>
+            <input type="text" id="cfgEmailDomain" placeholder="@tedshotdogs.com">
+          </div>
+          <button class="btn btn-primary" onclick="saveOrgPins()">Save Access Settings</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Admin Email Whitelist</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Only these email addresses can use the Admin PIN. Leave empty to allow the next person who uses the Admin PIN to become the first admin.</p>
+          <div class="form-group">
+            <label>Authorized Admin Emails <span style="color:var(--ted-muted);font-weight:400">(comma or newline separated)</span></label>
+            <textarea id="cfgAdminEmails" rows="4" style="font-family:inherit" placeholder="owner@tedshotdogs.com, regional@tedshotdogs.com"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="saveAdminEmails()">Save Admin Whitelist</button>
+        </div>
+      </div>
+
+      <!-- EMAIL RULES -->
+      <div class="settings-pane" id="settings-email">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Automatic Email Triggers</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">When these events occur, Ted's Hub will send an email to the relevant recipients (new hire, store email, leader emails).</p>
+          <div id="emailTriggerList" style="display:flex;flex-direction:column;gap:10px"></div>
+          <button class="btn btn-primary" style="margin-top:14px" onclick="saveEmailTriggers()">Save Triggers</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Email Delivery</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Choose how emails are actually sent. "Log only" is for testing — emails appear in the Activity Log but aren't delivered. EmailJS lets you send real emails from the browser without a backend.</p>
+          <div class="form-group">
+            <label>Provider</label>
+            <select id="cfgEmailProvider">
+              <option value="log">Log only (no real emails — great for testing)</option>
+              <option value="emailjs">EmailJS (real emails, no backend required)</option>
+            </select>
+          </div>
+          <div id="emailjsConfig" style="display:none">
+            <div class="form-group"><label>EmailJS Service ID</label><input type="text" id="cfgEmailjsService"></div>
+            <div class="form-group"><label>EmailJS Template ID</label><input type="text" id="cfgEmailjsTemplate"></div>
+            <div class="form-group"><label>EmailJS Public Key</label><input type="text" id="cfgEmailjsKey"></div>
+            <div style="font-size:12px;color:var(--ted-muted);margin-bottom:10px">Sign up free at <strong>emailjs.com</strong>, create a service + template with variables <code>{{to_email}}, {{cc}}, {{subject}}, {{body}}</code>, then paste your IDs here.</div>
+          </div>
+          <button class="btn btn-primary" onclick="saveEmailProvider()">Save Delivery Settings</button>
+          <button class="btn btn-ghost" onclick="sendTestEmail()">Send Test Email</button>
+        </div>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="settings-pane" id="settings-log">
+        <div class="card">
+          <div class="card-header-row">
+            <div class="card-title">Email Activity Log</div>
+            <button class="btn btn-sm btn-ghost" onclick="clearEmailLog()">Clear Log</button>
+          </div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Every email triggered by Ted's Hub — delivered or logged — shows up here for auditing.</p>
+          <div id="emailLogList" style="max-height:500px;overflow-y:auto"></div>
+        </div>
       </div>
 
       <div class="settings-pane" id="settings-danger">
@@ -1391,6 +1469,14 @@
       <div class="form-group"><label>Store Name</label><input type="text" id="storeName" placeholder="e.g. Transit Road"></div>
       <div class="form-group"><label>Address</label><input type="text" id="storeAddr" placeholder="Street, City"></div>
       <div class="form-group"><label>General Manager</label><input type="text" id="storeManager" placeholder="GM name"></div>
+      <div class="form-group">
+        <label>Store Email <span style="color:var(--ted-muted);font-weight:400">(receives all store notifications)</span></label>
+        <input type="email" id="storeEmail" placeholder="transitroad@tedshotdogs.com">
+      </div>
+      <div class="form-group">
+        <label>Leader Emails <span style="color:var(--ted-muted);font-weight:400">(comma-separated — cc'd on alerts)</span></label>
+        <textarea id="storeLeaderEmails" rows="3" placeholder="gm@tedshotdogs.com, shiftlead1@tedshotdogs.com, shiftlead2@tedshotdogs.com" style="font-family:inherit"></textarea>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-danger" id="storeDelete" style="display:none" onclick="deleteStore()">Delete</button>
@@ -1755,6 +1841,8 @@ const KEYS = {
   docFolders: 'teds-hub-doc-folders',
   trainingSessions: 'teds-hub-training-sessions',
   announcements: 'teds-hub-announcements',
+  orgSettings: 'teds-hub-org-settings',
+  emailLog: 'teds-hub-email-log',
 };
 function load(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } }
 function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
@@ -1854,6 +1942,23 @@ function iconForType(type) {
 let users = load(KEYS.users, []);
 let stores = load(KEYS.stores, []);
 let session = load(KEYS.session, null);
+let orgSettings = load(KEYS.orgSettings, {
+  teamPin: '4321',
+  adminPin: '9999',
+  emailDomain: '@tedshotdogs.com',
+  adminEmails: [],
+  emailTriggers: {
+    newHireWelcome: true,
+    trainingDayComplete: true,
+    trainingAllComplete: true,
+    announcementPosted: true,
+    documentUploaded: false,
+    checklistSubmitted: false,
+  },
+  emailProvider: 'log', // 'log' | 'emailjs' | 'resend'
+  emailjs: { serviceId: '', templateId: '', publicKey: '' },
+});
+let emailLog = load(KEYS.emailLog, []);
 let sopsCustom = load(KEYS.sopsCustom, {});
 let sopsOverride = load(KEYS.sopsOverride, {});
 let sopsDeleted = load(KEYS.sopsDeleted, []);
@@ -1952,20 +2057,58 @@ document.getElementById('signinForm').addEventListener('submit', e => {
   e.preventDefault();
   const email = document.getElementById('siEmail').value.trim().toLowerCase();
   const pin = document.getElementById('siPin').value;
-  // Require @tedshotdogs.com email
-  if (!email.endsWith('@tedshotdogs.com')) { showLoginError('Please use your @tedshotdogs.com email address.'); return; }
-  // Universal access PIN
-  if (pin !== '4321') { showLoginError('Incorrect PIN. Please try again.'); return; }
+  const domain = orgSettings.emailDomain || '@tedshotdogs.com';
+  // Require configured email domain
+  if (!email.endsWith(domain)) { showLoginError('Please use your ' + domain + ' email address.'); return; }
+
+  // Determine access tier from PIN
+  let tier = null;
+  if (pin === orgSettings.adminPin) tier = 'admin';
+  else if (pin === orgSettings.teamPin) tier = 'team';
+  if (!tier) { showLoginError('Incorrect PIN. Please try again.'); return; }
+
+  // Admin PIN requires the email to be in the admin whitelist (unless list is empty — first admin bootstrap)
+  if (tier === 'admin' && orgSettings.adminEmails.length > 0 && !orgSettings.adminEmails.map(e=>e.toLowerCase()).includes(email)) {
+    showLoginError('This email is not authorized for admin access.');
+    return;
+  }
+
   // Auto-create or find user by email
   let u = users.find(x => x.email.toLowerCase() === email);
+  const isNewHire = !u;
   if (!u) {
     const nameFromEmail = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    u = { id: uid(), name: nameFromEmail, email, pin: '4321', role: 'team_member', storeId: stores[0]?.id };
+    u = { id: uid(), name: nameFromEmail, email, pin, role: tier === 'admin' ? 'admin' : 'team_member', storeId: stores[0]?.id, createdAt: new Date().toISOString() };
     users.push(u);
+    // Bootstrap first admin into whitelist
+    if (tier === 'admin' && orgSettings.adminEmails.length === 0) {
+      orgSettings.adminEmails.push(email);
+      save(KEYS.orgSettings, orgSettings);
+    }
+    save(KEYS.users, users);
+  } else if (tier === 'admin' && u.role !== 'admin') {
+    u.role = 'admin';
+    save(KEYS.users, users);
+  } else if (tier === 'team' && u.role === 'admin' && !orgSettings.adminEmails.map(e=>e.toLowerCase()).includes(email)) {
+    // If someone admin-whitelisted uses team PIN, keep them admin; otherwise demote
+    u.role = 'team_member';
     save(KEYS.users, users);
   }
   session = { userId: u.id, activeStoreId: u.storeId || stores[0]?.id };
   save(KEYS.session, session);
+
+  // Fire new-hire welcome email
+  if (isNewHire && orgSettings.emailTriggers.newHireWelcome) {
+    const store = stores.find(s => s.id === u.storeId);
+    dispatchEmail({
+      event: 'newHireWelcome',
+      to: [u.email],
+      cc: store ? [store.email, ...(store.leaderEmails || [])].filter(Boolean) : [],
+      subject: `Welcome to Ted's, ${u.name}!`,
+      body: `Hi ${u.name},\n\nWelcome to Ted's! Your Ted's Hub account has been created. You can sign in any time at your Ted's Hub with your @tedshotdogs.com email.\n\nYour store: ${store?.name || 'Not yet assigned'}\n\n— The Ted's Team`,
+    });
+  }
+
   showApp();
 });
 
@@ -2380,6 +2523,18 @@ async function handleFiles(files) {
       uploadedDocs.push(rec);
       item.querySelector('.status').textContent = 'Uploaded';
       item.querySelector('.status').className = 'status ok';
+
+      // Email trigger: Document Uploaded
+      if (orgSettings.emailTriggers?.documentUploaded) {
+        const store = stores.find(s => s.id === activeStoreId);
+        dispatchEmail({
+          event: 'documentUploaded',
+          to: store ? [store.email].filter(Boolean) : [],
+          cc: store?.leaderEmails || [],
+          subject: `📁 New document uploaded: ${file.name}`,
+          body: `${currentUser?.name || 'Someone'} uploaded a new document to Ted's Hub:\n\nFile: ${file.name}\nFolder: ${folder}\nSize: ${fmtSize(file.size)}\nStore: ${store?.name || 'Unknown'}\n\nOpen Ted's Hub to view.`,
+        });
+      }
     } catch (err) {
       console.error(err);
       item.querySelector('.status').textContent = 'Failed';
@@ -2681,6 +2836,20 @@ function submitTrainingDay(tsId, day) {
   save(KEYS.trainingSessions, trainingSessions);
   activeTrainingDay = null;
   renderTraining();
+
+  // Email trigger: Training Day Completed
+  if (orgSettings.emailTriggers?.trainingDayComplete) {
+    const trainee = users.find(u => u.id === ts.userId) || { name: ts.userName, email: ts.userEmail };
+    const store = stores.find(s => s.id === ts.storeId);
+    const scheduleEntry = (typeof SCHEDULE !== 'undefined') ? SCHEDULE.find(x => x.day === day) : null;
+    dispatchEmail({
+      event: 'trainingDayComplete',
+      to: store ? [store.email].filter(Boolean) : [],
+      cc: [...(store?.leaderEmails || []), trainee?.email].filter(Boolean),
+      subject: `✅ Day ${day} Complete — ${trainee?.name || 'A team member'}`,
+      body: `${trainee?.name || 'A team member'} just submitted Day ${day}${scheduleEntry ? ' — ' + scheduleEntry.title : ''} of their 9-day training.\n\nStore: ${store?.name || 'Unknown'}\nDate: ${new Date().toLocaleString()}\n\nOpen Ted's Hub to review.`,
+    });
+  }
 }
 
 function completeTraining(tsId) {
@@ -2688,10 +2857,24 @@ function completeTraining(tsId) {
   const ts = trainingSessions.find(s => s.id === tsId);
   if (!ts) return;
   ts.status = 'completed';
+  ts.completedAt = Date.now();
   save(KEYS.trainingSessions, trainingSessions);
   activeTrainingSession = null;
   activeTrainingDay = null;
   renderTraining();
+
+  // Email trigger: All 9 Days Training Complete
+  if (orgSettings.emailTriggers?.trainingAllComplete) {
+    const trainee = users.find(u => u.id === ts.userId) || { name: ts.userName, email: ts.userEmail };
+    const store = stores.find(s => s.id === ts.storeId);
+    dispatchEmail({
+      event: 'trainingAllComplete',
+      to: [trainee?.email].filter(Boolean),
+      cc: store ? [store.email, ...(store.leaderEmails || [])].filter(Boolean) : [],
+      subject: `🎉 Congratulations ${trainee?.name || ''} — 9-Day Training Complete!`,
+      body: `Congratulations ${trainee?.name || ''}!\n\nYou've officially completed the Ted's 9-Day New Hire Training. Welcome to the team.\n\nStore: ${store?.name || 'Unknown'}\nCompleted: ${new Date().toLocaleString()}\n\nYour manager will be in touch about next steps.\n\n— The Ted's Team`,
+    });
+  }
 }
 
 // ============ TRAINING SCHEDULE ============
@@ -2804,7 +2987,179 @@ function saveProfile() {
 function renderSettings() {
   renderStoreList();
   renderUserList();
+  renderAdminSettings();
+  renderEmailTriggers();
+  renderEmailLog();
 }
+
+// ---- Admin & Security ----
+function renderAdminSettings() {
+  document.getElementById('cfgTeamPin').value = orgSettings.teamPin || '';
+  document.getElementById('cfgAdminPin').value = orgSettings.adminPin || '';
+  document.getElementById('cfgEmailDomain').value = orgSettings.emailDomain || '@tedshotdogs.com';
+  document.getElementById('cfgAdminEmails').value = (orgSettings.adminEmails || []).join(', ');
+  document.getElementById('cfgEmailProvider').value = orgSettings.emailProvider || 'log';
+  document.getElementById('cfgEmailjsService').value = orgSettings.emailjs?.serviceId || '';
+  document.getElementById('cfgEmailjsTemplate').value = orgSettings.emailjs?.templateId || '';
+  document.getElementById('cfgEmailjsKey').value = orgSettings.emailjs?.publicKey || '';
+  document.getElementById('emailjsConfig').style.display = (orgSettings.emailProvider === 'emailjs') ? 'block' : 'none';
+}
+
+function saveOrgPins() {
+  const team = document.getElementById('cfgTeamPin').value.trim();
+  const admin = document.getElementById('cfgAdminPin').value.trim();
+  const domain = document.getElementById('cfgEmailDomain').value.trim();
+  if (!/^\d{4}$/.test(team) || !/^\d{4}$/.test(admin)) { alert('Both PINs must be exactly 4 digits.'); return; }
+  if (team === admin) { alert('Team PIN and Admin PIN must be different.'); return; }
+  if (!domain.startsWith('@')) { alert('Email domain must start with @ (e.g. @tedshotdogs.com)'); return; }
+  orgSettings.teamPin = team;
+  orgSettings.adminPin = admin;
+  orgSettings.emailDomain = domain;
+  save(KEYS.orgSettings, orgSettings);
+  alert('Access settings saved.');
+}
+
+function saveAdminEmails() {
+  const list = parseEmailList(document.getElementById('cfgAdminEmails').value);
+  orgSettings.adminEmails = list;
+  save(KEYS.orgSettings, orgSettings);
+  alert(`Admin whitelist saved (${list.length} ${list.length===1?'address':'addresses'}).`);
+}
+
+// ---- Email Rules ----
+const EMAIL_EVENT_LABELS = {
+  newHireWelcome: { label: 'New Hire Welcome', desc: "When a new email signs in for the first time, send them a welcome email and cc the store." },
+  trainingDayComplete: { label: 'Training Day Completed', desc: 'When a user checks off all items for one training day, notify store leaders.' },
+  trainingAllComplete: { label: '9-Day Training Completed', desc: 'When all 9 days are complete, congratulate the hire and cc leaders.' },
+  announcementPosted: { label: 'New Announcement Posted', desc: 'Email all team members when an admin or manager posts an announcement.' },
+  documentUploaded: { label: 'New Document Uploaded', desc: 'Notify the store when a new document is uploaded to the library.' },
+  checklistSubmitted: { label: 'Checklist Submitted', desc: 'When a shift checklist is submitted, send a copy to leaders.' },
+};
+function renderEmailTriggers() {
+  const el = document.getElementById('emailTriggerList');
+  el.innerHTML = Object.keys(EMAIL_EVENT_LABELS).map(k => {
+    const on = orgSettings.emailTriggers?.[k] ? 'checked' : '';
+    const meta = EMAIL_EVENT_LABELS[k];
+    return `
+      <label style="display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--ted-border);border-radius:8px;cursor:pointer">
+        <input type="checkbox" data-trigger="${k}" ${on} style="margin-top:3px;transform:scale(1.2)">
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:14px">${meta.label}</div>
+          <div style="font-size:12px;color:var(--ted-muted);margin-top:2px">${meta.desc}</div>
+        </div>
+      </label>
+    `;
+  }).join('');
+}
+function saveEmailTriggers() {
+  const checks = document.querySelectorAll('#emailTriggerList input[type="checkbox"]');
+  const next = {};
+  checks.forEach(c => { next[c.dataset.trigger] = c.checked; });
+  orgSettings.emailTriggers = next;
+  save(KEYS.orgSettings, orgSettings);
+  alert('Email triggers saved.');
+}
+
+document.getElementById('cfgEmailProvider')?.addEventListener('change', e => {
+  document.getElementById('emailjsConfig').style.display = (e.target.value === 'emailjs') ? 'block' : 'none';
+});
+
+function saveEmailProvider() {
+  orgSettings.emailProvider = document.getElementById('cfgEmailProvider').value;
+  orgSettings.emailjs = {
+    serviceId: document.getElementById('cfgEmailjsService').value.trim(),
+    templateId: document.getElementById('cfgEmailjsTemplate').value.trim(),
+    publicKey: document.getElementById('cfgEmailjsKey').value.trim(),
+  };
+  save(KEYS.orgSettings, orgSettings);
+  alert('Email delivery settings saved.');
+}
+
+function sendTestEmail() {
+  dispatchEmail({
+    event: 'test',
+    to: [currentUser.email],
+    cc: [],
+    subject: "Ted's Hub — Test Email",
+    body: `Hi ${currentUser.name},\n\nThis is a test email from Ted's Hub sent on ${new Date().toLocaleString()}.\n\nIf you're using "Log only" mode, this test was only recorded in the Activity Log. Switch to EmailJS in Email Rules to actually send real emails.\n\n— Ted's Hub`,
+  });
+  alert('Test email dispatched. Check the Activity Log tab.');
+}
+
+// ---- Email Log ----
+function renderEmailLog() {
+  const el = document.getElementById('emailLogList');
+  if (!emailLog.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><div style="font-size:40px;margin-bottom:8px">📭</div><div>No emails sent yet.</div></div>';
+    return;
+  }
+  el.innerHTML = emailLog.slice().reverse().map(e => `
+    <div style="padding:12px;border:1px solid var(--ted-border);border-radius:8px;margin-bottom:8px;background:#fff">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div><span style="background:${e.delivered?'#E6F4EA':'#FFF3CD'};color:${e.delivered?'#137333':'#856404'};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;text-transform:uppercase">${e.delivered?'Delivered':'Logged'}</span> <span style="font-size:11px;color:var(--ted-muted);margin-left:6px">${e.event}</span></div>
+        <div style="font-size:11px;color:var(--ted-muted)">${new Date(e.ts).toLocaleString()}</div>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${e.subject}</div>
+      <div style="font-size:12px;color:var(--ted-muted);margin-bottom:6px">To: ${e.to.join(', ')}${e.cc?.length ? ' · Cc: ' + e.cc.join(', ') : ''}</div>
+      <div style="font-size:12px;white-space:pre-wrap;background:var(--ted-cream);padding:8px;border-radius:4px">${e.body}</div>
+    </div>
+  `).join('');
+}
+function clearEmailLog() {
+  if (!confirm('Clear the entire email activity log?')) return;
+  emailLog = [];
+  save(KEYS.emailLog, emailLog);
+  renderEmailLog();
+}
+
+// ---- Email Dispatch ----
+function dispatchEmail({ event, to, cc = [], subject, body }) {
+  const clean = arr => (arr || []).filter(Boolean).map(e => e.trim()).filter(e => /\S+@\S+/.test(e));
+  to = clean(to);
+  cc = clean(cc);
+  if (!to.length && !cc.length) return;
+  const entry = { event, to, cc, subject, body, ts: new Date().toISOString(), delivered: false };
+
+  if (orgSettings.emailProvider === 'emailjs' && orgSettings.emailjs?.serviceId) {
+    // Lazy-load EmailJS SDK, then send
+    const sendViaEmailJS = () => {
+      try {
+        window.emailjs.init({ publicKey: orgSettings.emailjs.publicKey });
+        window.emailjs.send(orgSettings.emailjs.serviceId, orgSettings.emailjs.templateId, {
+          to_email: to.join(','),
+          cc: cc.join(','),
+          subject,
+          body,
+        }).then(() => {
+          entry.delivered = true;
+          emailLog.push(entry);
+          save(KEYS.emailLog, emailLog);
+        }).catch(err => {
+          entry.error = String(err);
+          emailLog.push(entry);
+          save(KEYS.emailLog, emailLog);
+        });
+      } catch (err) {
+        entry.error = String(err);
+        emailLog.push(entry);
+        save(KEYS.emailLog, emailLog);
+      }
+    };
+    if (!window.emailjs) {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      s.onload = sendViaEmailJS;
+      s.onerror = () => { entry.error = 'Failed to load EmailJS SDK'; emailLog.push(entry); save(KEYS.emailLog, emailLog); };
+      document.head.appendChild(s);
+    } else {
+      sendViaEmailJS();
+    }
+  } else {
+    emailLog.push(entry);
+    save(KEYS.emailLog, emailLog);
+  }
+}
+
 document.querySelectorAll('.settings-tabs .tab').forEach(t => {
   t.addEventListener('click', () => {
     document.querySelectorAll('.settings-tabs .tab').forEach(x => x.classList.remove('active'));
@@ -2816,18 +3171,23 @@ document.querySelectorAll('.settings-tabs .tab').forEach(t => {
 
 function renderStoreList() {
   const el = document.getElementById('storeList');
-  el.innerHTML = stores.map(s => `
+  el.innerHTML = stores.map(s => {
+    const leadersCount = (s.leaderEmails || []).length;
+    const emailBit = s.email ? `📧 ${s.email}` : '<span style="color:#c77">No store email</span>';
+    const leadersBit = leadersCount ? ` · 👥 ${leadersCount} leader${leadersCount===1?'':'s'}` : '';
+    return `
     <div class="settings-row">
       <div style="font-size:20px">🏪</div>
       <div class="meta">
         <div class="name">${s.name}</div>
         <div class="sub">${s.address || '—'} ${s.manager ? '· GM: ' + s.manager : ''}</div>
+        <div class="sub" style="margin-top:3px;font-size:11px">${emailBit}${leadersBit}</div>
       </div>
       <div class="actions">
         <button class="icon-btn-sm" onclick="openStoreEditor('${s.id}')" title="Edit">✏️</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 let editingStoreId = null;
@@ -2838,19 +3198,26 @@ function openStoreEditor(id) {
   document.getElementById('storeName').value = s?.name || '';
   document.getElementById('storeAddr').value = s?.address || '';
   document.getElementById('storeManager').value = s?.manager || '';
+  document.getElementById('storeEmail').value = s?.email || '';
+  document.getElementById('storeLeaderEmails').value = (s?.leaderEmails || []).join(', ');
   document.getElementById('storeDelete').style.display = (id && stores.length > 1) ? 'inline-flex' : 'none';
   document.getElementById('storeEditModal').classList.add('open');
+}
+function parseEmailList(str) {
+  return str.split(/[,;\n]/).map(e => e.trim()).filter(e => /\S+@\S+\.\S+/.test(e));
 }
 function saveStore() {
   const name = document.getElementById('storeName').value.trim();
   const address = document.getElementById('storeAddr').value.trim();
   const manager = document.getElementById('storeManager').value.trim();
+  const email = document.getElementById('storeEmail').value.trim();
+  const leaderEmails = parseEmailList(document.getElementById('storeLeaderEmails').value);
   if (!name) { alert('Store name is required.'); return; }
   if (editingStoreId) {
     const s = stores.find(x => x.id === editingStoreId);
-    Object.assign(s, { name, address, manager });
+    Object.assign(s, { name, address, manager, email, leaderEmails });
   } else {
-    stores.push({ id: uid(), name, address, manager });
+    stores.push({ id: uid(), name, address, manager, email, leaderEmails });
   }
   save(KEYS.stores, stores);
   closeModal('storeEditModal');
@@ -3070,6 +3437,19 @@ function saveAnnouncement() {
   save(KEYS.announcements, announcements);
   closeModal('announcementModal');
   renderAnnouncements();
+
+  // Email trigger: Announcement Posted
+  if (orgSettings.emailTriggers?.announcementPosted) {
+    const toList = users.map(u => u.email);
+    const ccList = stores.flatMap(s => [s.email, ...(s.leaderEmails || [])]).filter(Boolean);
+    dispatchEmail({
+      event: 'announcementPosted',
+      to: toList,
+      cc: ccList,
+      subject: `📢 ${pinned ? '[Pinned] ' : ''}${title}`,
+      body: `${ann.author} posted a new announcement:\n\n${title}\n\n${body}\n\n— Sent from Ted's Hub`,
+    });
+  }
 }
 
 function deleteAnnouncement(id) {
@@ -3088,6 +3468,7 @@ function renderAll() {
   renderDirectory();
   renderAnnouncements();
   loadUploadedDocs();
+  if (document.body.classList.contains('is-admin')) renderSettings();
 }
 
 // ============ INIT ============
