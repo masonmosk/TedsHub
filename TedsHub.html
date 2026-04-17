@@ -1042,6 +1042,32 @@
   body.dark main.content::-webkit-scrollbar-thumb { background: #3a3632; }
   body.dark #loginScreen { background: #1a1715; }
   body.dark .upload-item { background: var(--ted-cream); }
+  /* Announcements — override hardcoded light backgrounds */
+  body.dark .announcement { background: var(--ted-white); color: var(--ted-text); }
+  body.dark .announcement.pinned { background: #2f2a22; border-left-color: var(--ted-gold); }
+  body.dark .announcement .title,
+  body.dark .announcement .body { color: var(--ted-text); }
+  body.dark .announcement .date { color: var(--ted-muted); }
+  /* Announcements board container */
+  body.dark .announcements-board { background: var(--ted-white); }
+  body.dark .announcements-card { background: var(--ted-white); }
+  /* Hero keeps red gradient but text stays readable */
+  body.dark .hero-stat { background: rgba(0,0,0,0.18); }
+  /* Misc light-bg components */
+  body.dark .first-run { background: #2a251f; color: var(--ted-text); }
+  body.dark .note, body.dark .hint, body.dark .empty-state-sm,
+  body.dark .empty { background: var(--ted-cream); color: var(--ted-text); }
+  body.dark .cat-tag { background: var(--ted-cream); color: var(--ted-text); }
+  body.dark .badge, body.dark .badge-pdf, body.dark .role-tag {
+    background: var(--ted-cream); color: var(--ted-text);
+  }
+  body.dark .tab { color: var(--ted-muted); }
+  body.dark .tab.active { color: var(--ted-text); border-bottom-color: var(--ted-red-bright); }
+  body.dark .breadcrumb { color: var(--ted-muted); }
+  body.dark .page-subtitle { color: var(--ted-muted); }
+  body.dark .card-title, body.dark .page-title, body.dark h1, body.dark h2, body.dark h3, body.dark h4 { color: var(--ted-text); }
+  body.dark .btn-ghost { background: transparent; color: var(--ted-text); border-color: var(--ted-border); }
+  body.dark .btn-ghost:hover { background: var(--ted-cream); }
 </style>
 </head>
 <body>
@@ -1546,6 +1572,10 @@
         </select>
       </div>
       <div class="form-group"><label>Short Description</label><input type="text" id="sopEditDesc" placeholder="One-line summary"></div>
+      <div class="form-group">
+        <label>Video URL <span style="color:var(--ted-muted);font-weight:400">(optional — YouTube, Vimeo, or Loom)</span></label>
+        <input type="url" id="sopEditVideo" placeholder="https://youtube.com/watch?v=… or https://vimeo.com/… or https://loom.com/share/…">
+      </div>
       <div class="form-group"><label>Body (HTML supported — use &lt;h3&gt;, &lt;ol&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;p&gt;, &lt;strong&gt;)</label>
         <textarea id="sopEditBody" placeholder="<h3>Steps</h3><ol><li>First step</li><li>Second step</li></ol>"></textarea>
       </div>
@@ -1687,6 +1717,10 @@
       <div class="form-group" style="display:flex;align-items:center;gap:8px">
         <input type="checkbox" id="annPinned" style="width:auto">
         <label for="annPinned" style="margin:0;text-transform:none;font-size:13px;color:var(--ted-text)">Pin this announcement to the top</label>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="annRequired" style="width:auto">
+        <label for="annRequired" style="margin:0;text-transform:none;font-size:13px;color:var(--ted-text)">Require acknowledgment — team must click "I read this" (admin tracks who has)</label>
       </div>
     </div>
     <div class="modal-footer">
@@ -2350,13 +2384,14 @@ function renderSOPs() {
   }
   grid.innerHTML = filtered.map(s => {
     const isCustom = sopsCustom[s.id] != null;
+    const hasVideo = !!toEmbedUrl(s.videoUrl);
     return `
     <div class="sop-card" onclick="openSOP('${s.id}')">
       <button class="edit-btn" onclick="event.stopPropagation();openSOPEditor('${s.id}')">✏️</button>
-      <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}</div>
+      <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}${hasVideo ? '<span class="custom-tag" style="background:#e8f4ff;color:#1a66c5">▶ VIDEO</span>' : ''}</div>
       <h4>${s.title}</h4>
       <p>${s.desc}</p>
-      <div class="footer"><span>📄 Procedure</span><span>View →</span></div>
+      <div class="footer"><span>${hasVideo ? '🎬 Video + procedure' : '📄 Procedure'}</span><span>View →</span></div>
     </div>`;
   }).join('');
   document.getElementById('statSops').textContent = all.length;
@@ -2379,7 +2414,7 @@ function openSOP(id) {
   if (!sop) return;
   document.getElementById('sopModalTitle').textContent = sop.title;
   document.getElementById('sopModalCat').textContent = sop.cat;
-  document.getElementById('sopModalBody').innerHTML = sop.body;
+  document.getElementById('sopModalBody').innerHTML = renderSOPVideoBlock(sop.videoUrl) + sop.body;
   document.getElementById('sopModal').classList.add('open');
 }
 function closeModal(id) {
@@ -2405,6 +2440,7 @@ function openSOPEditor(id) {
   document.getElementById('sopEditTitleInput').value = sop?.title || '';
   document.getElementById('sopEditCat').value = sop?.cat || 'Dining Room';
   document.getElementById('sopEditDesc').value = sop?.desc || '';
+  document.getElementById('sopEditVideo').value = sop?.videoUrl || '';
   document.getElementById('sopEditBody').value = sop?.body || '';
   document.getElementById('sopEditDelete').style.display = id ? 'inline-flex' : 'none';
   document.getElementById('sopEditModal').classList.add('open');
@@ -2413,23 +2449,68 @@ function saveSOP() {
   const title = document.getElementById('sopEditTitleInput').value.trim();
   const cat = document.getElementById('sopEditCat').value;
   const desc = document.getElementById('sopEditDesc').value.trim();
+  const videoUrl = document.getElementById('sopEditVideo').value.trim();
   const body = document.getElementById('sopEditBody').value.trim();
   if (!title || !desc || !body) { alert('Title, description, and body are all required.'); return; }
+  const patch = { title, cat, desc, videoUrl, body };
   if (editingSopId) {
     if (sopsCustom[editingSopId]) {
-      sopsCustom[editingSopId] = { ...sopsCustom[editingSopId], title, cat, desc, body };
+      sopsCustom[editingSopId] = { ...sopsCustom[editingSopId], ...patch };
       save(KEYS.sopsCustom, sopsCustom);
     } else {
-      sopsOverride[editingSopId] = { title, cat, desc, body };
+      sopsOverride[editingSopId] = patch;
       save(KEYS.sopsOverride, sopsOverride);
     }
   } else {
     const id = 'custom-' + uid();
-    sopsCustom[id] = { id, title, cat, desc, body };
+    sopsCustom[id] = { id, ...patch };
     save(KEYS.sopsCustom, sopsCustom);
   }
   closeModal('sopEditModal');
   renderSOPs();
+}
+
+// Parse a YouTube/Vimeo/Loom URL into an embed URL (or return null)
+function toEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '');
+    // YouTube
+    if (host === 'youtube.com' || host === 'm.youtube.com') {
+      const v = u.searchParams.get('v');
+      if (v) return 'https://www.youtube.com/embed/' + v;
+      const m = u.pathname.match(/\/embed\/([^/?]+)/);
+      if (m) return 'https://www.youtube.com/embed/' + m[1];
+    }
+    if (host === 'youtu.be') {
+      return 'https://www.youtube.com/embed' + u.pathname;
+    }
+    // Vimeo
+    if (host === 'vimeo.com') {
+      const m = u.pathname.match(/\/(\d+)/);
+      if (m) return 'https://player.vimeo.com/video/' + m[1];
+    }
+    if (host === 'player.vimeo.com') return url;
+    // Loom
+    if (host === 'loom.com' || host === 'www.loom.com') {
+      const m = u.pathname.match(/\/share\/([^/?]+)/);
+      if (m) return 'https://www.loom.com/embed/' + m[1];
+      const em = u.pathname.match(/\/embed\/([^/?]+)/);
+      if (em) return url;
+    }
+  } catch (e) {}
+  return null;
+}
+
+function renderSOPVideoBlock(videoUrl) {
+  const embed = toEmbedUrl(videoUrl);
+  if (!embed) return '';
+  return `<div style="position:relative;padding-top:56.25%;margin-bottom:16px;background:#000;border-radius:8px;overflow:hidden">
+    <iframe src="${embed}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen></iframe>
+  </div>`;
 }
 function deleteSOP() {
   if (!editingSopId) return;
@@ -3011,18 +3092,143 @@ function completeTraining(tsId) {
   activeTrainingDay = null;
   renderTraining();
 
+  const trainee = users.find(u => u.id === ts.userId) || { name: ts.userName, email: ts.userEmail };
+  const store = stores.find(s => s.id === ts.storeId);
+
   // Email trigger: All 9 Days Training Complete
   if (orgSettings.emailTriggers?.trainingAllComplete) {
-    const trainee = users.find(u => u.id === ts.userId) || { name: ts.userName, email: ts.userEmail };
-    const store = stores.find(s => s.id === ts.storeId);
     dispatchEmail({
       event: 'trainingAllComplete',
       to: [trainee?.email].filter(Boolean),
       cc: store ? [store.email, ...(store.leaderEmails || [])].filter(Boolean) : [],
       subject: `🎉 Congratulations ${trainee?.name || ''} — 9-Day Training Complete!`,
-      body: `Congratulations ${trainee?.name || ''}!\n\nYou've officially completed the Ted's 9-Day New Hire Training. Welcome to the team.\n\nStore: ${store?.name || 'Unknown'}\nCompleted: ${new Date().toLocaleString()}\n\nYour manager will be in touch about next steps.\n\n— The Ted's Team`,
+      body: `Congratulations ${trainee?.name || ''}!\n\nYou've officially completed the Ted's 9-Day New Hire Training. Welcome to the team.\n\nStore: ${store?.name || 'Unknown'}\nCompleted: ${new Date().toLocaleString()}\n\nA certificate has been generated for you — check your Ted's Hub profile to download it.\n\nYour manager will be in touch about next steps.\n\n— The Ted's Team`,
     });
   }
+
+  // Auto-generate certificate
+  generateTrainingCertificate(trainee, store, ts);
+}
+
+// ============ TRAINING CERTIFICATE (PDF) ============
+function loadJsPDF() {
+  return new Promise((resolve, reject) => {
+    if (window.jspdf) { resolve(window.jspdf); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
+    s.onload = () => resolve(window.jspdf);
+    s.onerror = () => reject(new Error('Failed to load PDF library'));
+    document.head.appendChild(s);
+  });
+}
+
+async function generateTrainingCertificate(trainee, store, ts) {
+  try {
+    const { jsPDF } = await loadJsPDF();
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'letter' });
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+
+    // Background frame
+    doc.setFillColor(251, 247, 242); // ted-cream
+    doc.rect(0, 0, W, H, 'F');
+    // Outer border
+    doc.setDrawColor(139, 0, 0); // ted-red
+    doc.setLineWidth(4);
+    doc.rect(30, 30, W - 60, H - 60);
+    // Inner border (gold)
+    doc.setDrawColor(232, 166, 40);
+    doc.setLineWidth(1.5);
+    doc.rect(46, 46, W - 92, H - 92);
+
+    // Title
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(139, 0, 0);
+    doc.setFontSize(42);
+    doc.text("TED'S HOTDOGS", W / 2, 120, { align: 'center' });
+
+    doc.setFontSize(14);
+    doc.setTextColor(107, 107, 107);
+    doc.setFont('helvetica', 'normal');
+    doc.text("CHARCOAL GRILLED · SINCE 1927", W / 2, 142, { align: 'center' });
+
+    // Certificate headline
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(32);
+    doc.setTextColor(26, 26, 26);
+    doc.text('Certificate of Training Completion', W / 2, 200, { align: 'center' });
+
+    // Subtext
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(14);
+    doc.setTextColor(80, 80, 80);
+    doc.text('This is to certify that', W / 2, 240, { align: 'center' });
+
+    // Name
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(40);
+    doc.setTextColor(139, 0, 0);
+    doc.text(trainee?.name || 'Team Member', W / 2, 300, { align: 'center' });
+
+    // Underline for name
+    const nameWidth = doc.getTextWidth(trainee?.name || 'Team Member');
+    doc.setDrawColor(232, 166, 40);
+    doc.setLineWidth(1);
+    doc.line(W / 2 - nameWidth / 2 - 20, 315, W / 2 + nameWidth / 2 + 20, 315);
+
+    // Body
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(15);
+    doc.setTextColor(40, 40, 40);
+    doc.text('has successfully completed the', W / 2, 345, { align: 'center' });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(20);
+    doc.text('9-Day New Hire Training Program', W / 2, 375, { align: 'center' });
+
+    if (store?.name) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(13);
+      doc.setTextColor(107, 107, 107);
+      doc.text(`at Ted's Hotdogs — ${store.name}`, W / 2, 400, { align: 'center' });
+    }
+
+    // Signatures
+    const sigY = H - 120;
+    const leftX = W * 0.28;
+    const rightX = W * 0.72;
+    doc.setDrawColor(40, 40, 40);
+    doc.setLineWidth(0.5);
+    doc.line(leftX - 70, sigY, leftX + 70, sigY);
+    doc.line(rightX - 70, sigY, rightX + 70, sigY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.text('Trainee Signature', leftX, sigY + 14, { align: 'center' });
+    doc.text(store?.manager || 'Manager Signature', rightX, sigY + 14, { align: 'center' });
+
+    // Date
+    doc.setFontSize(11);
+    doc.setTextColor(40, 40, 40);
+    const dateStr = new Date(ts.completedAt || Date.now()).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+    doc.text(`Completed: ${dateStr}`, W / 2, H - 60, { align: 'center' });
+
+    // Save / download
+    const filename = `Teds-Training-Certificate-${(trainee?.name || 'TeamMember').replace(/\s+/g,'_')}.pdf`;
+    doc.save(filename);
+  } catch (err) {
+    console.error('Certificate generation failed:', err);
+    alert('Could not generate certificate automatically. Please download manually from your profile page.');
+  }
+}
+
+// Expose a manual "download my certificate" helper (useful from Profile page)
+function downloadMyCertificate() {
+  if (!currentUser) return;
+  const ts = trainingSessions.find(s => s.userId === currentUser.id && s.status === 'completed');
+  if (!ts) { alert("You haven't completed the 9-day training yet."); return; }
+  const store = stores.find(s => s.id === ts.storeId);
+  generateTrainingCertificate(currentUser, store, ts);
 }
 
 // ============ TRAINING SCHEDULE ============
@@ -3684,30 +3890,73 @@ function renderAnnouncements() {
   }
   empty.style.display = 'none';
   const canDelete = currentUser && ['admin','manager'].includes(currentUser.role);
+  const isAdmin = currentUser && currentUser.role === 'admin';
   list.innerHTML = sorted.map(a => {
     const d = new Date(a.date);
     const dateStr = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }).toUpperCase();
-    return `<div class="announcement${a.pinned ? ' pinned' : ''}">
+    const acks = a.acks || [];
+    const hasAcked = currentUser && acks.includes(currentUser.id);
+    let ackBlock = '';
+    if (a.requireAck) {
+      if (hasAcked) {
+        ackBlock = `<div style="margin-top:10px;padding:8px 12px;background:rgba(45,125,70,0.12);border-left:3px solid var(--ted-success);border-radius:4px;font-size:12px;color:var(--ted-success);font-weight:600">✓ You acknowledged this</div>`;
+      } else {
+        ackBlock = `<div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="acknowledgeAnnouncement('${a.id}')">✓ I've read this</button></div>`;
+      }
+      if (isAdmin) {
+        const total = users.length || 1;
+        const pct = Math.round((acks.length / total) * 100);
+        ackBlock += `<div style="margin-top:8px;font-size:11px;color:var(--ted-muted)"><strong>${acks.length}/${total}</strong> team members acknowledged (${pct}%) · <a href="#" onclick="event.preventDefault();viewAckDetails('${a.id}')" style="color:var(--ted-red);text-decoration:underline">View list</a></div>`;
+      }
+    }
+    return `<div class="announcement${a.pinned ? ' pinned' : ''}${a.requireAck ? ' required' : ''}">
       <div class="ann-top">
         <div>
           <div class="ann-meta">
             <span class="date">${dateStr}</span>
             <span class="ann-author">${a.author || 'Team'}</span>
             ${a.pinned ? '<span class="pin-badge">📌 Pinned</span>' : ''}
+            ${a.requireAck ? '<span class="pin-badge" style="color:var(--ted-red-bright)">⚠ Required</span>' : ''}
           </div>
           <div class="title">${a.title}</div>
         </div>
         ${canDelete ? `<button class="ann-delete" title="Delete announcement" onclick="deleteAnnouncement('${a.id}')">✕</button>` : ''}
       </div>
       <div class="body">${a.body}</div>
+      ${ackBlock}
     </div>`;
   }).join('');
+}
+
+function acknowledgeAnnouncement(id) {
+  const a = announcements.find(x => x.id === id);
+  if (!a || !currentUser) return;
+  a.acks = a.acks || [];
+  if (!a.acks.includes(currentUser.id)) {
+    a.acks.push(currentUser.id);
+    save(KEYS.announcements, announcements);
+  }
+  renderAnnouncements();
+}
+
+function viewAckDetails(id) {
+  const a = announcements.find(x => x.id === id);
+  if (!a) return;
+  const acks = a.acks || [];
+  const ackedUsers = users.filter(u => acks.includes(u.id));
+  const missingUsers = users.filter(u => !acks.includes(u.id));
+  const line = (u) => `• ${u.name} (${u.email})`;
+  const msg = `Acknowledgments for "${a.title}":\n\n` +
+              `✅ Acknowledged (${ackedUsers.length}):\n${ackedUsers.map(line).join('\n') || '  none'}\n\n` +
+              `❌ Not yet (${missingUsers.length}):\n${missingUsers.map(line).join('\n') || '  none'}`;
+  alert(msg);
 }
 
 function openNewAnnouncement() {
   document.getElementById('annTitle').value = '';
   document.getElementById('annBody').value = '';
   document.getElementById('annPinned').checked = false;
+  document.getElementById('annRequired').checked = false;
   openModal('announcementModal');
 }
 
@@ -3715,6 +3964,7 @@ function saveAnnouncement() {
   const title = document.getElementById('annTitle').value.trim();
   const body = document.getElementById('annBody').value.trim();
   const pinned = document.getElementById('annPinned').checked;
+  const requireAck = document.getElementById('annRequired').checked;
   if (!title) { alert('Please enter a title.'); return; }
   if (!body) { alert('Please enter a message.'); return; }
   const ann = {
@@ -3722,6 +3972,8 @@ function saveAnnouncement() {
     title,
     body,
     pinned,
+    requireAck,
+    acks: [], // array of userIds who have acknowledged
     author: currentUser ? currentUser.name : 'Unknown',
     date: new Date().toISOString(),
   };
