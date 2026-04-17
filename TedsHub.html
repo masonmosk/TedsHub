@@ -958,6 +958,59 @@
     .page-title { color: #000 !important; font-size: 28px; }
   }
 
+  /* ============ ADMIN DASHBOARD ============ */
+  body.is-admin .admin-dashboard { display: block !important; }
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
+  }
+  @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .kpi-grid { grid-template-columns: 1fr; } }
+  .kpi-card {
+    background: var(--ted-white); border: 1px solid var(--ted-border); border-radius: 8px;
+    padding: 14px; box-shadow: var(--shadow-sm);
+  }
+  .kpi-label {
+    font-size: 10px; font-weight: 700; color: var(--ted-muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: 'Oswald', sans-serif; font-size: 32px; font-weight: 700;
+    color: var(--ted-red); line-height: 1;
+  }
+  .kpi-sub {
+    font-size: 11px; color: var(--ted-muted); margin-top: 6px;
+  }
+  .kpi-sub.positive { color: var(--ted-success); font-weight: 600; }
+  .kpi-sub.warning { color: #C77; font-weight: 600; }
+  .dashboard-row {
+    display: flex; gap: 14px; margin-bottom: 16px;
+  }
+  @media (max-width: 900px) { .dashboard-row { flex-direction: column; } }
+  .store-progress-row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid var(--ted-border);
+  }
+  .store-progress-row:last-child { border-bottom: none; }
+  .store-progress-name { flex: 0 0 40%; font-size: 13px; font-weight: 600; }
+  .store-progress-bar {
+    flex: 1; height: 8px; background: var(--ted-cream); border-radius: 4px; overflow: hidden;
+  }
+  .store-progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--ted-gold), var(--ted-red));
+    transition: width 0.4s ease;
+  }
+  .store-progress-pct {
+    flex: 0 0 60px; text-align: right; font-weight: 600; font-size: 12px;
+  }
+  .activity-row {
+    display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--ted-border); font-size: 12px;
+  }
+  .activity-row:last-child { border-bottom: none; }
+  .activity-icon { font-size: 16px; }
+  .activity-text { flex: 1; }
+  .activity-meta { color: var(--ted-muted); font-size: 11px; margin-top: 2px; }
+  body.dark .kpi-card { background: var(--ted-white); border-color: var(--ted-border); }
+
   /* ============ HAMBURGER & MOBILE ============ */
   .hamburger {
     display: none; background: rgba(255,255,255,0.15); border: none;
@@ -1186,6 +1239,34 @@
           <div class="hero-stat clickable-stat" data-goto="documents"><div class="num" id="statDocs">—</div><div class="lbl">Documents</div></div>
           <div class="hero-stat clickable-stat" data-goto="checklists"><div class="num" id="statChecks">—</div><div class="lbl">Checklists</div></div>
           <div class="hero-stat clickable-stat" data-goto="directory"><div class="num" id="statTeam">—</div><div class="lbl">Team</div></div>
+        </div>
+      </div>
+
+      <!-- ADMIN DASHBOARD — visible only to admins -->
+      <div class="admin-dashboard admin-only" id="adminDashboard" style="margin-bottom: 24px; display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--ted-red);text-transform:uppercase;padding:4px 10px;background:var(--ted-cream);border-radius:4px">ADMIN VIEW</span>
+          <div style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:600">OPERATIONS OVERVIEW</div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Active Users (7 days)</div><div class="kpi-value" id="kpiActiveUsers">—</div><div class="kpi-sub" id="kpiActiveUsersSub">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Training in Progress</div><div class="kpi-value" id="kpiTrainingInProgress">—</div><div class="kpi-sub" id="kpiTrainingInProgressSub">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Training Completed</div><div class="kpi-value" id="kpiTrainingDone">—</div><div class="kpi-sub" id="kpiTrainingDoneSub">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Overdue Trainees</div><div class="kpi-value" id="kpiOverdue">—</div><div class="kpi-sub" id="kpiOverdueSub">No activity in 3+ days</div></div>
+          <div class="kpi-card"><div class="kpi-label">New Announcements (7d)</div><div class="kpi-value" id="kpiAnnouncements">—</div><div class="kpi-sub" id="kpiAckRate">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Documents Added (7d)</div><div class="kpi-value" id="kpiNewDocs">—</div><div class="kpi-sub" id="kpiNewDocsSub">—</div></div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="card" style="flex:1">
+            <div class="card-title" style="margin-bottom:10px">Training Progress by Store</div>
+            <div id="storeProgressList"></div>
+          </div>
+          <div class="card" style="flex:1">
+            <div class="card-title" style="margin-bottom:10px">Recent Activity</div>
+            <div id="dashRecentActivity"></div>
+          </div>
         </div>
       </div>
 
@@ -1471,7 +1552,7 @@
           <button class="btn btn-primary" onclick="saveOrgPins()">Save Access Settings</button>
         </div>
 
-        <div class="card">
+        <div class="card" style="margin-bottom:16px">
           <div class="card-title">Admin Email Whitelist</div>
           <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Only these email addresses can use the Admin PIN. Leave empty to allow the next person who uses the Admin PIN to become the first admin.</p>
           <div class="form-group">
@@ -1479,6 +1560,12 @@
             <textarea id="cfgAdminEmails" rows="4" style="font-family:inherit" placeholder="owner@tedshotdogs.com, regional@tedshotdogs.com"></textarea>
           </div>
           <button class="btn btn-primary" onclick="saveAdminEmails()">Save Admin Whitelist</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Training Quizzes</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Add a knowledge check to any day of the 9-day training. Trainees must score 80%+ on the quiz before their day submission is accepted.</p>
+          <div id="quizAdminList"></div>
         </div>
       </div>
 
@@ -1514,6 +1601,26 @@
 
       <!-- ACTIVITY LOG -->
       <div class="settings-pane" id="settings-log">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header-row">
+            <div class="card-title">Audit Trail</div>
+            <div style="display:flex;gap:6px">
+              <select id="auditFilter" onchange="renderAuditLog()" style="padding:6px 10px;font-size:12px;border:1px solid var(--ted-border);border-radius:4px">
+                <option value="">All events</option>
+                <option value="login,logout">Sign-in / sign-out</option>
+                <option value="sopCreate,sopEdit,sopDelete">SOPs</option>
+                <option value="announcement,announcementAck">Announcements</option>
+                <option value="docUpload,docDelete">Documents</option>
+                <option value="trainingStart,trainingDaySubmit,trainingComplete,quizPass,quizFail">Training</option>
+                <option value="userAdd,userEdit,userDelete,storeAdd,storeEdit,storeDelete,settingsChange">Admin changes</option>
+              </select>
+              <button class="btn btn-sm btn-ghost" onclick="clearAuditLog()">Clear</button>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Every significant action in Ted's Hub — sign-ins, uploads, edits, training submissions, settings changes. Last 500 events.</p>
+          <div id="auditLogList" style="max-height:500px;overflow-y:auto"></div>
+        </div>
+
         <div class="card">
           <div class="card-header-row">
             <div class="card-title">Email Activity Log</div>
@@ -1695,6 +1802,41 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('uploadModal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUIZ MODALS ============ -->
+<div class="modal-overlay" id="quizModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="cat-tag">KNOWLEDGE CHECK</div><h2 id="quizTitle">Quiz</h2></div>
+      <button class="modal-close" onclick="closeModal('quizModal')">✕</button>
+    </div>
+    <div class="modal-body" id="quizBody"></div>
+    <div class="modal-footer">
+      <span id="quizProgress" style="font-size:12px;color:var(--ted-muted);margin-right:auto"></span>
+      <button class="btn btn-ghost" onclick="closeModal('quizModal')">Cancel</button>
+      <button class="btn btn-primary" id="quizSubmitBtn" onclick="submitQuiz()">Submit Answers</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="quizEditModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="cat-tag">QUIZ EDITOR</div><h2 id="quizEditTitle">Edit Quiz — Day ?</h2></div>
+      <button class="modal-close" onclick="closeModal('quizEditModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--ted-muted);margin-bottom:10px">Add up to 10 questions. Users must answer at least 80% correctly to complete this training day.</p>
+      <div id="quizEditList"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addQuizQuestion()" style="margin-top:10px">+ Add Question</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="clearQuizForDay()">Remove All</button>
+      <button class="btn btn-ghost" onclick="closeModal('quizEditModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveQuizForDay()">Save Quiz</button>
     </div>
   </div>
 </div>
@@ -1997,6 +2139,7 @@ const KEYS = {
   announcements: 'teds-hub-announcements',
   orgSettings: 'teds-hub-org-settings',
   emailLog: 'teds-hub-email-log',
+  quizzes: 'teds-hub-quizzes',
 };
 function load(key, def) { try { return JSON.parse(localStorage.getItem(key)) ?? def; } catch { return def; } }
 function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
@@ -2113,6 +2256,21 @@ let orgSettings = load(KEYS.orgSettings, {
   emailjs: { serviceId: '', templateId: '', publicKey: '' },
 });
 let emailLog = load(KEYS.emailLog, []);
+let quizzes = load(KEYS.quizzes, {
+  1: [
+    { q: 'What should you do first when a new guest walks in?', options: ['Take their order immediately', 'Greet them with a smile and eye contact', 'Ask for their loyalty card', 'Hand them a menu and walk away'], correct: 1 },
+    { q: 'Where should chemicals be stored?', options: ['Next to the food prep area', 'Under the fryer', 'Away from food and food-contact surfaces', 'Wherever there is space'], correct: 2 },
+    { q: "What does FIFO stand for?", options: ['Fresh In, Fresh Out', 'First In, First Out', 'Food In, Food Out', 'Fry In, Fry Out'], correct: 1 },
+  ],
+  2: [
+    { q: 'The correct way to lower a fryer basket is to…', options: ['Drop it fast from high up', 'Slowly, to avoid splash', 'Toss it in', 'It does not matter'], correct: 1 },
+    { q: 'If hot oil overflows, you should…', options: ['Run water on it', 'Never leave it unattended; call a manager', 'Keep cooking', 'Cover with a towel'], correct: 1 },
+  ],
+  3: [
+    { q: 'When taking payment in cash, you should…', options: ['Count cash aloud when making change', 'Put it in your pocket', 'Skip counting — customers trust us', 'Give back whatever feels right'], correct: 0 },
+  ],
+});
+let auditLog = load('teds-hub-audit-log', []);
 let sopsCustom = load(KEYS.sopsCustom, {});
 let sopsOverride = load(KEYS.sopsOverride, {});
 let sopsDeleted = load(KEYS.sopsDeleted, []);
@@ -2166,6 +2324,11 @@ function showApp() {
   renderUserChip();
   renderStoreSwitcher();
   renderAll();
+  // Audit — avoid double-logging within 2 min (page refresh / multiple showApp calls)
+  const lastLogin = auditLog.filter(a => a.event === 'login' && a.userId === currentUser.id).slice(-1)[0];
+  if (!lastLogin || (Date.now() - new Date(lastLogin.ts).getTime() > 120000)) {
+    logAudit('login', { role: currentUser.role, storeId: activeStoreId });
+  }
 }
 
 function applyRolePermissions() {
@@ -2184,6 +2347,7 @@ function applyRolePermissions() {
 }
 
 function logout() {
+  logAudit('logout', {});
   session = null;
   save(KEYS.session, null);
   currentUser = null;
@@ -2453,6 +2617,7 @@ function saveSOP() {
   const body = document.getElementById('sopEditBody').value.trim();
   if (!title || !desc || !body) { alert('Title, description, and body are all required.'); return; }
   const patch = { title, cat, desc, videoUrl, body };
+  const isNew = !editingSopId;
   if (editingSopId) {
     if (sopsCustom[editingSopId]) {
       sopsCustom[editingSopId] = { ...sopsCustom[editingSopId], ...patch };
@@ -2466,6 +2631,7 @@ function saveSOP() {
     sopsCustom[id] = { id, ...patch };
     save(KEYS.sopsCustom, sopsCustom);
   }
+  logAudit(isNew ? 'sopCreate' : 'sopEdit', { title, cat });
   closeModal('sopEditModal');
   renderSOPs();
 }
@@ -2515,6 +2681,7 @@ function renderSOPVideoBlock(videoUrl) {
 function deleteSOP() {
   if (!editingSopId) return;
   if (!confirm('Delete this SOP? This cannot be undone.')) return;
+  const sopTitle = effectiveSOPs().find(s => s.id === editingSopId)?.title || 'Unknown';
   if (sopsCustom[editingSopId]) {
     delete sopsCustom[editingSopId];
     save(KEYS.sopsCustom, sopsCustom);
@@ -2524,6 +2691,7 @@ function deleteSOP() {
     delete sopsOverride[editingSopId];
     save(KEYS.sopsOverride, sopsOverride);
   }
+  logAudit('sopDelete', { title: sopTitle });
   closeModal('sopEditModal');
   renderSOPs();
 }
@@ -2752,6 +2920,7 @@ async function handleFiles(files) {
       uploadedDocs.push(rec);
       item.querySelector('.status').textContent = 'Uploaded';
       item.querySelector('.status').className = 'status ok';
+      logAudit('docUpload', { name: file.name, folder, size: file.size });
 
       // Email trigger: Document Uploaded
       if (orgSettings.emailTriggers?.documentUploaded) {
@@ -3057,12 +3226,19 @@ function submitTrainingDay(tsId, day) {
   if (!ts) return;
   const dayData = ts.days[day];
   if (!dayData) return;
+  // Quiz gate — if this day has a quiz and user hasn't passed, open quiz modal instead
+  const quiz = getQuizForDay(day);
+  if (quiz && quiz.length && !(dayData.quizPassed === true)) {
+    openQuizModal(tsId, day, quiz);
+    return;
+  }
   dayData.status = 'submitted';
   dayData.submittedAt = Date.now();
   if (day === ts.currentDay && day < 9) {
     ts.currentDay = day + 1;
   }
   save(KEYS.trainingSessions, trainingSessions);
+  logAudit('trainingDaySubmit', { day, title: (typeof SCHEDULE !== 'undefined' ? (SCHEDULE.find(x => x.day === day)?.title || '') : '') });
   activeTrainingDay = null;
   renderTraining();
 
@@ -3094,6 +3270,7 @@ function completeTraining(tsId) {
 
   const trainee = users.find(u => u.id === ts.userId) || { name: ts.userName, email: ts.userEmail };
   const store = stores.find(s => s.id === ts.storeId);
+  logAudit('trainingComplete', { title: trainee?.name || 'Unknown' });
 
   // Email trigger: All 9 Days Training Complete
   if (orgSettings.emailTriggers?.trainingAllComplete) {
@@ -3344,6 +3521,37 @@ function renderSettings() {
   renderAdminSettings();
   renderEmailTriggers();
   renderEmailLog();
+  renderAuditLog();
+  renderQuizAdminList();
+}
+
+function renderAuditLog() {
+  const el = document.getElementById('auditLogList');
+  if (!el) return;
+  const filterVal = document.getElementById('auditFilter')?.value || '';
+  const allowedEvents = filterVal ? filterVal.split(',') : null;
+  const items = auditLog.slice().reverse().filter(a => !allowedEvents || allowedEvents.includes(a.event));
+  if (!items.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><div style="font-size:40px;margin-bottom:8px">📋</div><div>No audit events match your filter.</div></div>';
+    return;
+  }
+  el.innerHTML = items.map(a => {
+    const detailBits = [];
+    if (a.details) {
+      if (a.details.title) detailBits.push(a.details.title);
+      if (a.details.name && !a.details.title) detailBits.push(a.details.name);
+      if (a.details.day) detailBits.push('Day ' + a.details.day);
+      if (a.details.score != null) detailBits.push('Score: ' + a.details.score + '%');
+    }
+    return `
+      <div class="activity-row" style="padding:10px 4px;border-bottom:1px solid var(--ted-border)">
+        <div class="activity-icon" style="font-size:16px">${AUDIT_ICONS[a.event] || '•'}</div>
+        <div class="activity-text" style="flex:1">
+          <div style="font-size:13px"><strong>${a.userName}</strong> — ${auditLabel(a.event)}${detailBits.length ? ': ' + detailBits.join(' · ') : ''}</div>
+          <div class="activity-meta">${new Date(a.ts).toLocaleString()}${a.userEmail ? ' · ' + a.userEmail : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ---- Admin & Security ----
@@ -3370,6 +3578,7 @@ function saveOrgPins() {
   orgSettings.adminPin = admin;
   orgSettings.emailDomain = domain;
   save(KEYS.orgSettings, orgSettings);
+  logAudit('settingsChange', { title: 'Access PINs & email domain' });
   alert('Access settings saved.');
 }
 
@@ -3377,6 +3586,7 @@ function saveAdminEmails() {
   const list = parseEmailList(document.getElementById('cfgAdminEmails').value);
   orgSettings.adminEmails = list;
   save(KEYS.orgSettings, orgSettings);
+  logAudit('settingsChange', { title: 'Admin email whitelist', count: list.length });
   alert(`Admin whitelist saved (${list.length} ${list.length===1?'address':'addresses'}).`);
 }
 
@@ -3935,6 +4145,7 @@ function acknowledgeAnnouncement(id) {
   if (!a.acks.includes(currentUser.id)) {
     a.acks.push(currentUser.id);
     save(KEYS.announcements, announcements);
+    logAudit('announcementAck', { title: a.title });
   }
   renderAnnouncements();
 }
@@ -3979,6 +4190,7 @@ function saveAnnouncement() {
   };
   announcements.unshift(ann);
   save(KEYS.announcements, announcements);
+  logAudit('announcement', { title, pinned, requireAck });
   closeModal('announcementModal');
   renderAnnouncements();
 
@@ -4012,7 +4224,346 @@ function renderAll() {
   renderDirectory();
   renderAnnouncements();
   loadUploadedDocs();
-  if (document.body.classList.contains('is-admin')) renderSettings();
+  if (document.body.classList.contains('is-admin')) {
+    renderSettings();
+    renderAdminDashboard();
+  }
+}
+
+// ============ AUDIT LOG ============
+// Note: emailLog already tracks email events. auditLog tracks everything else.
+function logAudit(event, details) {
+  const entry = {
+    id: 'a-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+    ts: new Date().toISOString(),
+    event,
+    details: details || {},
+    userId: currentUser?.id || null,
+    userName: currentUser?.name || 'System',
+    userEmail: currentUser?.email || null,
+  };
+  auditLog.push(entry);
+  // Keep last 500 entries to avoid localStorage bloat
+  if (auditLog.length > 500) auditLog = auditLog.slice(-500);
+  save('teds-hub-audit-log', auditLog);
+}
+function clearAuditLog() {
+  if (!confirm('Clear the entire activity audit log?')) return;
+  auditLog = [];
+  save('teds-hub-audit-log', auditLog);
+  if (typeof renderAuditLog === 'function') renderAuditLog();
+}
+const AUDIT_ICONS = {
+  login: '🔓', logout: '🚪', sopCreate: '📋', sopEdit: '✏️', sopDelete: '🗑️',
+  announcement: '📢', announcementAck: '✅', docUpload: '📁', docDelete: '🗑️',
+  trainingStart: '🎓', trainingDaySubmit: '✅', trainingComplete: '🏆',
+  userAdd: '👤', userEdit: '✏️', userDelete: '🗑️',
+  storeAdd: '🏪', storeEdit: '✏️', storeDelete: '🗑️',
+  settingsChange: '⚙️', import: '⬆️', export: '⬇️', reset: '🧨',
+  contactAdd: '📇', contactEdit: '✏️', contactDelete: '🗑️',
+  quizPass: '🎯', quizFail: '❌',
+};
+function auditLabel(e) {
+  const labels = {
+    login: 'Signed in', logout: 'Signed out',
+    sopCreate: 'Created SOP', sopEdit: 'Edited SOP', sopDelete: 'Deleted SOP',
+    announcement: 'Posted announcement', announcementAck: 'Acknowledged announcement',
+    docUpload: 'Uploaded document', docDelete: 'Deleted document',
+    trainingStart: 'Started training', trainingDaySubmit: 'Submitted training day',
+    trainingComplete: 'Completed 9-day training',
+    userAdd: 'Added user', userEdit: 'Edited user', userDelete: 'Deleted user',
+    storeAdd: 'Added store', storeEdit: 'Edited store', storeDelete: 'Deleted store',
+    settingsChange: 'Changed settings', import: 'Imported data', export: 'Exported data',
+    reset: 'Reset all data',
+    contactAdd: 'Added contact', contactEdit: 'Edited contact', contactDelete: 'Deleted contact',
+    quizPass: 'Passed quiz', quizFail: 'Failed quiz',
+  };
+  return labels[e] || e;
+}
+
+// ============ QUIZ SYSTEM ============
+let activeQuiz = null; // { tsId, day, questions, answers, score }
+
+function getQuizForDay(day) {
+  return quizzes[day] || null;
+}
+
+function openQuizModal(tsId, day, questions) {
+  activeQuiz = { tsId, day, questions, answers: new Array(questions.length).fill(-1), score: null };
+  document.getElementById('quizTitle').textContent = `Day ${day} Knowledge Check`;
+  document.getElementById('quizProgress').textContent = `${questions.length} question${questions.length === 1 ? '' : 's'} · 80% to pass`;
+  renderQuizBody();
+  document.getElementById('quizSubmitBtn').disabled = false;
+  document.getElementById('quizSubmitBtn').textContent = 'Submit Answers';
+  openModal('quizModal');
+}
+
+function renderQuizBody() {
+  const body = document.getElementById('quizBody');
+  body.innerHTML = activeQuiz.questions.map((q, i) => `
+    <div style="margin-bottom:20px;padding:14px;border:1px solid var(--ted-border);border-radius:8px">
+      <div style="font-weight:600;margin-bottom:10px;font-size:14px">${i+1}. ${q.q}</div>
+      ${q.options.map((opt, j) => `
+        <label style="display:flex;align-items:flex-start;gap:8px;padding:8px;border-radius:6px;cursor:pointer${activeQuiz.answers[i] === j ? ';background:var(--ted-cream)' : ''}">
+          <input type="radio" name="quiz-${i}" value="${j}" ${activeQuiz.answers[i] === j ? 'checked' : ''} onchange="activeQuiz.answers[${i}]=${j};renderQuizBody()" style="margin-top:3px">
+          <span style="font-size:13px">${opt}</span>
+        </label>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function submitQuiz() {
+  if (!activeQuiz) return;
+  const { questions, answers, tsId, day } = activeQuiz;
+  const unanswered = answers.filter(a => a < 0).length;
+  if (unanswered) { alert(`Please answer all ${questions.length} questions (${unanswered} remaining).`); return; }
+  let correct = 0;
+  questions.forEach((q, i) => { if (q.correct === answers[i]) correct++; });
+  const pct = Math.round((correct / questions.length) * 100);
+  const passed = pct >= 80;
+
+  // Show results
+  const body = document.getElementById('quizBody');
+  body.innerHTML = `
+    <div style="text-align:center;padding:30px 20px">
+      <div style="font-size:48px;margin-bottom:10px">${passed ? '🎯' : '❌'}</div>
+      <div style="font-family:'Oswald',sans-serif;font-size:26px;color:${passed ? 'var(--ted-success)' : 'var(--ted-red)'};font-weight:700;margin-bottom:8px">
+        ${passed ? 'You passed!' : 'Not quite there'}
+      </div>
+      <div style="font-size:16px;color:var(--ted-text);margin-bottom:16px">
+        You scored <strong>${correct}/${questions.length}</strong> (${pct}%)
+      </div>
+      ${passed
+        ? `<p style="font-size:13px;color:var(--ted-muted)">Nice work — your Day ${day} submission has been recorded.</p>`
+        : `<p style="font-size:13px;color:var(--ted-muted)">You need at least 80% to pass. Review the material and try again.</p>`
+      }
+      <div style="margin-top:18px;text-align:left">
+        ${questions.map((q, i) => `
+          <div style="padding:10px;border-left:3px solid ${q.correct === answers[i] ? 'var(--ted-success)' : 'var(--ted-red)'};background:var(--ted-cream);margin-bottom:8px;border-radius:4px">
+            <div style="font-size:12px;font-weight:600;margin-bottom:4px">${q.correct === answers[i] ? '✓' : '✗'} Q${i+1}: ${q.q}</div>
+            <div style="font-size:11px;color:var(--ted-muted)">Your answer: ${q.options[answers[i]]}</div>
+            ${q.correct !== answers[i] ? `<div style="font-size:11px;color:var(--ted-success);margin-top:2px">Correct: ${q.options[q.correct]}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Record audit
+  logAudit(passed ? 'quizPass' : 'quizFail', { day, score: pct });
+
+  if (passed) {
+    // Mark as passed on the training session day record
+    const ts = trainingSessions.find(s => s.id === tsId);
+    if (ts && ts.days[day]) {
+      ts.days[day].quizPassed = true;
+      ts.days[day].quizScore = pct;
+      save(KEYS.trainingSessions, trainingSessions);
+    }
+    document.getElementById('quizSubmitBtn').textContent = 'Continue & Submit Day';
+    document.getElementById('quizSubmitBtn').onclick = () => {
+      closeModal('quizModal');
+      activeQuiz = null;
+      submitTrainingDay(tsId, day);
+    };
+  } else {
+    document.getElementById('quizSubmitBtn').textContent = 'Retake Quiz';
+    document.getElementById('quizSubmitBtn').onclick = () => {
+      activeQuiz.answers = new Array(questions.length).fill(-1);
+      activeQuiz.score = null;
+      renderQuizBody();
+      document.getElementById('quizSubmitBtn').textContent = 'Submit Answers';
+      document.getElementById('quizSubmitBtn').onclick = submitQuiz;
+    };
+  }
+}
+
+// ---- Quiz Editor (admin) ----
+let editingQuizDay = null;
+let editingQuizDraft = [];
+
+function openQuizEditor(day) {
+  editingQuizDay = day;
+  editingQuizDraft = JSON.parse(JSON.stringify(quizzes[day] || []));
+  document.getElementById('quizEditTitle').textContent = `Edit Quiz — Day ${day}`;
+  renderQuizEditList();
+  openModal('quizEditModal');
+}
+
+function renderQuizEditList() {
+  const el = document.getElementById('quizEditList');
+  if (!editingQuizDraft.length) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--ted-muted);font-size:13px">No questions yet. Click "+ Add Question" below.</div>';
+    return;
+  }
+  el.innerHTML = editingQuizDraft.map((q, i) => `
+    <div style="margin-bottom:14px;padding:12px;border:1px solid var(--ted-border);border-radius:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--ted-muted);text-transform:uppercase;letter-spacing:1px">Question ${i+1}</div>
+        <button class="btn btn-sm btn-ghost" onclick="removeQuizQuestion(${i})" style="color:var(--ted-red)">Remove</button>
+      </div>
+      <div class="form-group" style="margin-bottom:8px"><label>Question</label>
+        <input type="text" value="${(q.q || '').replace(/"/g,'&quot;')}" onchange="editingQuizDraft[${i}].q=this.value" style="width:100%">
+      </div>
+      ${q.options.map((opt, j) => `
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+          <input type="radio" name="correct-${i}" ${q.correct === j ? 'checked' : ''} onchange="editingQuizDraft[${i}].correct=${j}" title="Mark as correct">
+          <input type="text" value="${(opt || '').replace(/"/g,'&quot;')}" placeholder="Option ${j+1}" onchange="editingQuizDraft[${i}].options[${j}]=this.value" style="flex:1">
+        </div>
+      `).join('')}
+      <div style="font-size:11px;color:var(--ted-muted);margin-top:4px">Radio button = correct answer</div>
+    </div>
+  `).join('');
+}
+
+function addQuizQuestion() {
+  editingQuizDraft.push({ q: '', options: ['', '', '', ''], correct: 0 });
+  renderQuizEditList();
+}
+function removeQuizQuestion(i) {
+  editingQuizDraft.splice(i, 1);
+  renderQuizEditList();
+}
+function saveQuizForDay() {
+  // Validate
+  for (let i = 0; i < editingQuizDraft.length; i++) {
+    const q = editingQuizDraft[i];
+    if (!q.q.trim()) { alert(`Question ${i+1} needs text.`); return; }
+    if (q.options.filter(o => o.trim()).length < 2) { alert(`Question ${i+1} needs at least 2 non-empty options.`); return; }
+  }
+  if (editingQuizDraft.length === 0) {
+    delete quizzes[editingQuizDay];
+  } else {
+    quizzes[editingQuizDay] = editingQuizDraft;
+  }
+  save(KEYS.quizzes, quizzes);
+  logAudit('settingsChange', { title: `Quiz for Day ${editingQuizDay}`, count: editingQuizDraft.length });
+  closeModal('quizEditModal');
+  renderQuizAdminList();
+  alert('Quiz saved.');
+}
+function clearQuizForDay() {
+  if (!confirm('Remove all questions for this day? This cannot be undone.')) return;
+  editingQuizDraft = [];
+  renderQuizEditList();
+}
+
+function renderQuizAdminList() {
+  const el = document.getElementById('quizAdminList');
+  if (!el) return;
+  el.innerHTML = [1,2,3,4,5,6,7,8,9].map(d => {
+    const scheduleTitle = (typeof SCHEDULE !== 'undefined' ? SCHEDULE.find(x => x.day === d)?.title : '') || '';
+    const qs = quizzes[d] || [];
+    return `
+      <div class="settings-row">
+        <div style="font-size:20px">🎯</div>
+        <div class="meta">
+          <div class="name">Day ${d} — ${scheduleTitle}</div>
+          <div class="sub">${qs.length ? qs.length + ' question' + (qs.length===1?'':'s') : 'No quiz — users can submit without a knowledge check'}</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-sm btn-ghost" onclick="openQuizEditor(${d})">${qs.length ? '✏️ Edit' : '+ Add Quiz'}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============ ADMIN DASHBOARD ============
+function renderAdminDashboard() {
+  const el = document.getElementById('adminDashboard');
+  if (!el) return;
+  if (!document.body.classList.contains('is-admin')) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+
+  const now = Date.now();
+  const DAY = 86400000;
+  const week = now - 7 * DAY;
+
+  // Active users in last 7 days (based on audit log logins OR createdAt)
+  const recentLogins = auditLog.filter(a => a.event === 'login' && new Date(a.ts).getTime() > week);
+  const activeUserIds = new Set(recentLogins.map(a => a.userId).filter(Boolean));
+  document.getElementById('kpiActiveUsers').textContent = activeUserIds.size;
+  document.getElementById('kpiActiveUsersSub').textContent = `of ${users.length} total users`;
+
+  // Training in progress / completed
+  const tsAll = trainingSessions || [];
+  const tsInProgress = tsAll.filter(t => t.status !== 'completed').length;
+  const tsDone = tsAll.filter(t => t.status === 'completed').length;
+  document.getElementById('kpiTrainingInProgress').textContent = tsInProgress;
+  document.getElementById('kpiTrainingInProgressSub').textContent = tsAll.length ? `${Math.round(tsInProgress/tsAll.length*100)}% of all sessions` : '—';
+  document.getElementById('kpiTrainingDone').textContent = tsDone;
+  document.getElementById('kpiTrainingDoneSub').textContent = tsAll.length ? `${Math.round(tsDone/tsAll.length*100)}% completion rate` : '—';
+
+  // Overdue trainees — in progress but no submitted day in last 3 days
+  const threeDays = now - 3 * DAY;
+  const overdue = tsAll.filter(t => {
+    if (t.status === 'completed') return false;
+    const lastSubmit = Object.values(t.days || {})
+      .map(d => d.submittedAt || 0)
+      .reduce((a, b) => Math.max(a, b), 0);
+    return lastSubmit < threeDays;
+  }).length;
+  const overdueEl = document.getElementById('kpiOverdue');
+  overdueEl.textContent = overdue;
+  const overdueSub = document.getElementById('kpiOverdueSub');
+  overdueSub.className = 'kpi-sub' + (overdue > 0 ? ' warning' : ' positive');
+  overdueSub.textContent = overdue > 0 ? `${overdue} need follow-up` : 'All trainees on track';
+
+  // Announcements + ack rate
+  const recentAnns = announcements.filter(a => new Date(a.date).getTime() > week);
+  document.getElementById('kpiAnnouncements').textContent = recentAnns.length;
+  const requiredAnns = announcements.filter(a => a.requireAck);
+  if (requiredAnns.length) {
+    const total = requiredAnns.length * (users.length || 1);
+    const got = requiredAnns.reduce((sum, a) => sum + (a.acks?.length || 0), 0);
+    const pct = total ? Math.round(got / total * 100) : 0;
+    document.getElementById('kpiAckRate').textContent = `${pct}% ack rate on required`;
+  } else {
+    document.getElementById('kpiAckRate').textContent = 'No required announcements';
+  }
+
+  // New docs in last 7 days
+  const newDocs = (uploadedDocs || []).filter(d => (d.uploadedAt || 0) > week).length;
+  document.getElementById('kpiNewDocs').textContent = newDocs;
+  document.getElementById('kpiNewDocsSub').textContent = newDocs > 0 ? 'Documents uploaded recently' : 'No recent uploads';
+
+  // Store progress
+  const sp = document.getElementById('storeProgressList');
+  if (stores.length === 0) {
+    sp.innerHTML = '<div style="color:var(--ted-muted);font-size:12px;padding:20px 0;text-align:center">No stores yet.</div>';
+  } else {
+    sp.innerHTML = stores.map(s => {
+      const storeTs = tsAll.filter(t => t.storeId === s.id);
+      const done = storeTs.filter(t => t.status === 'completed').length;
+      const pct = storeTs.length ? Math.round(done / storeTs.length * 100) : 0;
+      return `
+        <div class="store-progress-row">
+          <div class="store-progress-name">${s.name}</div>
+          <div class="store-progress-bar"><div class="store-progress-fill" style="width:${pct}%"></div></div>
+          <div class="store-progress-pct">${done}/${storeTs.length} · ${pct}%</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Recent activity
+  const ra = document.getElementById('dashRecentActivity');
+  const recent = auditLog.slice(-10).reverse();
+  if (!recent.length) {
+    ra.innerHTML = '<div style="color:var(--ted-muted);font-size:12px;padding:20px 0;text-align:center">No activity yet. Actions will appear here.</div>';
+  } else {
+    ra.innerHTML = recent.map(a => `
+      <div class="activity-row">
+        <div class="activity-icon">${AUDIT_ICONS[a.event] || '•'}</div>
+        <div class="activity-text">
+          <div><strong>${a.userName}</strong> ${auditLabel(a.event).toLowerCase()}${a.details?.title ? ' — ' + a.details.title : ''}</div>
+          <div class="activity-meta">${new Date(a.ts).toLocaleString()}</div>
+        </div>
+      </div>
+    `).join('');
+  }
 }
 
 // ============ INIT ============
