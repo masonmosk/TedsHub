@@ -189,8 +189,11 @@
   }
   .search-wrap input:focus { outline: 2px solid var(--ted-gold); }
   .search-wrap::before {
-    content: "🔍"; position: absolute; left: 12px; top: 50%;
-    transform: translateY(-50%); font-size: 13px;
+    content: ""; position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%); width: 14px; height: 14px;
+    background-color: var(--ted-muted);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>") no-repeat center;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>") no-repeat center;
   }
   .search-kbd {
     position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
@@ -469,8 +472,12 @@
   }
   .search-group { position: relative; flex: 1; min-width: 260px; }
   .search-group::before {
-    content: "🔍"; position: absolute; left: 12px; top: 50%;
-    transform: translateY(-50%); font-size: 13px; z-index: 1;
+    content: ""; position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%); z-index: 1;
+    width: 14px; height: 14px;
+    background-color: var(--ted-muted);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>") no-repeat center;
+            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.3-4.3'/></svg>") no-repeat center;
   }
   .chip {
     padding: 7px 14px; border-radius: 20px; background: white;
@@ -1083,12 +1090,13 @@
   .sidebar-overlay.open { display: block; }
 
   @media (max-width: 900px) {
-    .hamburger { display: inline-flex; align-items: center; justify-content: center; }
-    .logo-wrap { width: auto; }
-    .logo-text { font-size: 18px; }
+    header.topbar { padding: 0 10px; gap: 6px; }
+    .hamburger { display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
+    .logo-wrap { width: auto; gap: 8px; flex-shrink: 0; }
+    .logo-text { font-size: 16px; white-space: nowrap; }
     .logo-text small { display: none; }
     .header-logo-img { width: 32px; }
-    .search-wrap { max-width: none; margin: 0 10px; }
+    .search-wrap { max-width: none; margin: 0 6px; }
     .search-kbd { display: none; }
 
     aside.sidebar {
@@ -1101,27 +1109,70 @@
     main.content { padding: 20px 16px; }
     .page-title { font-size: 30px !important; }
     .hero { padding: 20px !important; }
-    .hero h1 { font-size: 28px !important; }
-    .hero-stats { gap: 14px !important; flex-wrap: wrap; }
+    .hero h1 { font-size: 32px !important; line-height: 1.05 !important; }
+    .hero-stats { gap: 10px !important; flex-wrap: wrap; }
     .grid-3, .grid-2 { grid-template-columns: 1fr !important; }
 
     /* Hide less essential header items on phones */
-    .store-switcher { min-width: auto; max-width: 140px; font-size: 11px; padding: 6px 8px; }
+    .store-switcher { min-width: auto; max-width: 120px; font-size: 11px; padding: 6px 8px; flex-shrink: 0; }
     .user-chip .name, .user-chip .role { display: none; }
-    .user-chip { padding: 2px; }
+    .user-chip { padding: 2px; flex-shrink: 0; }
+    .topbar-right { gap: 6px; }
 
     /* Bigger touch targets */
     .nav-item { padding: 14px 20px; font-size: 14px; }
     .checkbox-item, .checklist-item { padding: 12px !important; min-height: 44px; }
     .btn { min-height: 40px; }
+
+    /* Modals go full-width on phones */
+    .modal-overlay .modal, .modal-overlay .modal.narrow {
+      width: 95%; max-width: 95%; margin: 10px;
+    }
+    .modal-body { max-height: 70vh; overflow-y: auto; }
+
+    /* Settings tabs scroll horizontally if needed */
+    .settings-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .settings-tabs::-webkit-scrollbar { height: 0; }
+    .settings-tabs .tab { flex-shrink: 0; }
+
+    /* Admin dashboard: tighter KPI cards */
+    .kpi-card { padding: 12px; }
+    .kpi-value { font-size: 26px !important; }
+
+    /* Career path horizontal scroll */
+    .career-ladder { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .career-step { min-width: 180px; flex-shrink: 0; }
+
+    /* Announcement board internal list — no max-height on mobile */
+    .announcements-board #announcementsList { max-height: none !important; }
+
+    /* Prevent horizontal page scroll caused by stray wide elements */
+    body { overflow-x: hidden; }
+    .page { overflow-x: hidden; }
   }
 
   @media (max-width: 500px) {
-    .hero-stats { gap: 10px !important; }
-    .hero-stat .num { font-size: 24px !important; }
+    header.topbar { padding: 0 8px; }
+    .logo-text { display: none; } /* icon-only on tight phones */
+    .hero-stats { gap: 8px !important; }
+    .hero-stat .num { font-size: 22px !important; }
     .hero-stat .lbl { font-size: 9px !important; }
-    .search-wrap input { font-size: 16px; } /* prevents iOS zoom on focus */
+    .hero h1 { font-size: 28px !important; }
+    .hero { padding: 18px !important; }
+    .page-title { font-size: 26px !important; }
     .page-subtitle { font-size: 12px; }
+    .search-wrap input { font-size: 16px; padding-right: 14px; } /* prevents iOS zoom on focus */
+    .store-switcher { max-width: 100px; }
+    .search-wrap::before { display: none; }
+    .search-wrap.has-icon input { padding-left: 32px; }
+    /* Smaller icon button spacing */
+    .icon-btn { width: 32px; height: 32px; }
+  }
+
+  @media (max-width: 380px) {
+    .store-switcher { display: none; } /* at very narrow widths, free up header space */
+    .hero-stats { justify-content: center; }
+    .hero-stat { min-width: 72px; }
   }
 
   /* ============ DARK MODE ============ */
@@ -1181,7 +1232,8 @@
   body.dark .btn-ghost:hover { background: var(--ted-cream); }
 
   /* ============ LUCIDE ICONS ============ */
-  [data-lucide] { display: inline-block; vertical-align: -3px; stroke-width: 2; }
+  [data-lucide] { display: inline-block; vertical-align: -3px; stroke-width: 2; pointer-events: none; }
+  svg.lucide { pointer-events: none; }
   .nav-item [data-lucide] { width: 18px; height: 18px; stroke-width: 2; flex-shrink: 0; }
   .user-menu-item [data-lucide] { width: 16px; height: 16px; margin-right: 6px; vertical-align: -3px; }
   .quick-card [data-lucide].card-ico { width: 28px; height: 28px; stroke-width: 1.75; color: var(--ted-red); }
@@ -1460,6 +1512,51 @@
     }
   }
 
+  /* ============ DEMO BANNER ============ */
+  #demoBanner {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 110;
+    background: linear-gradient(90deg, #2a1f16 0%, #3d2d20 100%);
+    color: white;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 12px; line-height: 1.4;
+    transform: translateY(0);
+    transition: transform 0.3s var(--ease-out);
+  }
+  #demoBanner.hidden { transform: translateY(-100%); pointer-events: none; }
+  .demo-banner-inner {
+    max-width: 1400px; margin: 0 auto;
+    padding: 8px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .demo-badge {
+    background: var(--ted-gold); color: var(--ted-red-dark);
+    padding: 3px 8px; font-size: 10px; font-weight: 800;
+    letter-spacing: var(--track-wider); border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .demo-text { flex: 1; opacity: 0.9; }
+  .demo-close {
+    background: transparent; border: none; color: rgba(255,255,255,0.6);
+    cursor: pointer; padding: 4px 6px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background var(--dur-fast), color var(--dur-fast);
+    flex-shrink: 0;
+  }
+  .demo-close:hover { background: rgba(255,255,255,0.1); color: white; }
+  .demo-close [data-lucide] { width: 14px; height: 14px; }
+  body.demo-active header.topbar { top: 36px; }
+  body.demo-active #appWrap .layout { padding-top: 36px; }
+  body.demo-active #loginScreen { padding-top: 50px; }
+
+  @media (max-width: 700px) {
+    .demo-banner-inner { padding: 6px 10px; font-size: 11px; gap: 8px; }
+    .demo-text { font-size: 11px; line-height: 1.35; }
+    .demo-text strong { display: block; }
+    body.demo-active header.topbar { top: 52px; }
+    body.demo-active #appWrap .layout { padding-top: 52px; }
+    body.demo-active #loginScreen { padding-top: 64px; }
+  }
+
   /* ============ SPLASH SCREEN ============ */
   #splash {
     position: fixed; inset: 0; z-index: 2000;
@@ -1513,6 +1610,21 @@
   <div class="splash-logo">TED'S HUB</div>
   <div class="splash-tag">Charcoal Grilled · Since 1927</div>
   <div class="splash-loader"></div>
+</div>
+
+<!-- ============ DEMO BANNER (shown app-wide while IS_DEMO=true) ============ -->
+<div id="demoBanner" role="note">
+  <div class="demo-banner-inner">
+    <span class="demo-badge">DEMO</span>
+    <span class="demo-text">
+      <strong>You're viewing an interactive demo.</strong>
+      Data is saved locally in this browser only. For a production rollout
+      with real auth, Microsoft SSO, and multi-device sync, contact Mason.
+    </span>
+    <button class="demo-close" onclick="dismissDemoBanner()" title="Hide banner for this session" aria-label="Dismiss">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
 </div>
 
 <!-- ============ LOGIN SCREEN ============ -->
@@ -2680,13 +2792,123 @@ let announcements = load(KEYS.announcements, [
 ]);
 
 function seedDefaults() {
+  const now = Date.now();
+  const DAY = 86400000;
+
+  // Stores
   if (stores.length === 0) {
-    stores = [{ id: uid(), name: 'Main Street', address: '', manager: '' }];
+    stores = [
+      { id: 'store-main', name: 'Main Street', address: '2351 Main St, Buffalo NY', manager: 'Marco Rodriguez', email: 'mainstreet@tedshotdogs.com', leaderEmails: ['marco@tedshotdogs.com', 'amanda@tedshotdogs.com'] },
+      { id: 'store-transit', name: 'Transit Road', address: '7800 Transit Rd, Williamsville NY', manager: 'Sarah Chen', email: 'transit@tedshotdogs.com', leaderEmails: ['sarah@tedshotdogs.com'] },
+      { id: 'store-sheridan', name: 'Sheridan Drive', address: '4950 Sheridan Dr, Amherst NY', manager: 'Kevin Walsh', email: 'sheridan@tedshotdogs.com', leaderEmails: ['kevin@tedshotdogs.com', 'jordan@tedshotdogs.com'] },
+    ];
     save(KEYS.stores, stores);
   }
+
   if (!Array.isArray(docFolders) || docFolders.length === 0) {
     docFolders = ['New Hire Onboarding','Policies','Forms','Operations'];
     save(KEYS.docFolders, docFolders);
+  }
+
+  // Demo users — only seed once
+  if (users.length === 0) {
+    users = [
+      { id: 'user-owner',  name: 'Owner / Admin',     email: 'owner@tedshotdogs.com',   pin: '9999', role: 'admin',       storeId: 'store-main',     createdAt: new Date(now - 120 * DAY).toISOString() },
+      { id: 'user-marco',  name: 'Marco Rodriguez',   email: 'marco@tedshotdogs.com',   pin: '4321', role: 'manager',     storeId: 'store-main',     createdAt: new Date(now - 100 * DAY).toISOString() },
+      { id: 'user-sarah',  name: 'Sarah Chen',        email: 'sarah@tedshotdogs.com',   pin: '4321', role: 'manager',     storeId: 'store-transit',  createdAt: new Date(now - 90 * DAY).toISOString() },
+      { id: 'user-jess',   name: 'Jessica Park',      email: 'jess@tedshotdogs.com',    pin: '4321', role: 'shift_lead',  storeId: 'store-main',     createdAt: new Date(now - 45 * DAY).toISOString() },
+      { id: 'user-tyler',  name: 'Tyler Morrison',    email: 'tyler@tedshotdogs.com',   pin: '4321', role: 'team_member', storeId: 'store-main',     createdAt: new Date(now - 14 * DAY).toISOString() },
+      { id: 'user-brie',   name: 'Briana Sullivan',   email: 'briana@tedshotdogs.com',  pin: '4321', role: 'team_member', storeId: 'store-transit',  createdAt: new Date(now - 7 * DAY).toISOString() },
+      { id: 'user-alex',   name: 'Alex Nguyen',       email: 'alex@tedshotdogs.com',    pin: '4321', role: 'team_member', storeId: 'store-sheridan', createdAt: new Date(now - 3 * DAY).toISOString() },
+    ];
+    save(KEYS.users, users);
+  }
+
+  // Demo directory entries
+  if (directory.length === 0) {
+    directory = [
+      { id: 'dir-1', name: 'Marco Rodriguez',  role: 'General Manager',     phone: '(716) 555-0102', email: 'marco@tedshotdogs.com',    storeId: 'store-main' },
+      { id: 'dir-2', name: 'Sarah Chen',       role: 'General Manager',     phone: '(716) 555-0119', email: 'sarah@tedshotdogs.com',    storeId: 'store-transit' },
+      { id: 'dir-3', name: 'Kevin Walsh',      role: 'General Manager',     phone: '(716) 555-0144', email: 'kevin@tedshotdogs.com',    storeId: 'store-sheridan' },
+      { id: 'dir-4', name: 'Amanda Rose',      role: 'Assistant GM',        phone: '(716) 555-0188', email: 'amanda@tedshotdogs.com',   storeId: 'store-main' },
+      { id: 'dir-5', name: 'Jessica Park',     role: 'Shift Lead',          phone: '(716) 555-0211', email: 'jess@tedshotdogs.com',     storeId: 'store-main' },
+      { id: 'dir-6', name: 'Jordan Reyes',     role: 'Shift Lead',          phone: '(716) 555-0236', email: 'jordan@tedshotdogs.com',   storeId: 'store-sheridan' },
+      { id: 'dir-7', name: 'Cody McCormick',   role: 'Director of Operations', phone: '(716) 555-9763', email: 'cody@tedshotdogs.com',     storeId: 'all' },
+    ];
+    save(KEYS.directory, directory);
+  }
+
+  // Realistic announcements with acks
+  if (announcements.length === 0) {
+    announcements = [
+      {
+        id: 'ann-summer', title: 'Summer Hours Extended at Main Street & Transit',
+        body: "Starting this Monday, both Main Street and Transit Road will stay open until 10 PM on Friday and Saturday nights. Please update your availability in Square Clock if you can pick up late shifts. GMs: review Saturday schedules and send updated weekly plans by Thursday.",
+        pinned: true, requireAck: true, acks: ['user-marco', 'user-sarah', 'user-jess'],
+        author: 'Cody McCormick', date: new Date(now - 2 * DAY).toISOString(),
+      },
+      {
+        id: 'ann-fifo', title: 'Reminder: FIFO on All Perishables',
+        body: "Trainers, please review FIFO rotation with new hires during onboarding. Corporate will be spot-checking walk-ins next week. See the Food Handling Policy SOP for the refresher and make sure the chemical sign-off is completed.",
+        pinned: false, requireAck: true, acks: ['user-marco', 'user-sarah', 'user-jess', 'user-tyler'],
+        author: 'Owner / Admin', date: new Date(now - 6 * DAY).toISOString(),
+      },
+      {
+        id: 'ann-trays', title: 'Tray Artist Photo Contest',
+        body: "Post your best tray photo on Instagram with #TraysLikeCanvas. Top tray of the month wins lunch on Ted's for the whole shift. Winners announced the first Friday of every month.",
+        pinned: false, requireAck: false, acks: [],
+        author: 'Marco Rodriguez', date: new Date(now - 9 * DAY).toISOString(),
+      },
+      {
+        id: 'ann-welcome', title: "New Hub Launched — Welcome to Ted's Hub!",
+        body: "This is your new home for SOPs, documents, training, and team updates. Click around, and if anything's missing, let your GM know. Managers and admins can post announcements directly from the home page.",
+        pinned: false, requireAck: false, acks: [],
+        author: 'Owner / Admin', date: new Date(now - 14 * DAY).toISOString(),
+      },
+    ];
+    save(KEYS.announcements, announcements);
+  }
+
+  // Training sessions — one completed, one in-progress, one just starting
+  if (trainingSessions.length === 0) {
+    const mkDays = (completedCount) => {
+      const d = {};
+      for (let i = 1; i <= 9; i++) {
+        d[i] = { checks: {}, notes: '', status: i <= completedCount ? 'submitted' : (i === completedCount + 1 ? 'active' : 'locked'), submittedAt: i <= completedCount ? now - (10 - i) * DAY : null, quizPassed: i <= completedCount ? true : false, quizScore: i <= completedCount ? 100 : null };
+      }
+      return d;
+    };
+    const fmt = ms => new Date(ms).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+    trainingSessions = [
+      { id: 'ts-tyler',  userId: 'user-tyler',  traineeName: 'Tyler Morrison',  trainerName: 'Marco Rodriguez', userEmail: 'tyler@tedshotdogs.com',  storeId: 'store-main',     startDate: fmt(now - 12 * DAY), status: 'completed',   currentDay: 9, days: mkDays(9), completedAt: now - 1 * DAY },
+      { id: 'ts-brie',   userId: 'user-brie',   traineeName: 'Briana Sullivan', trainerName: 'Sarah Chen',      userEmail: 'briana@tedshotdogs.com', storeId: 'store-transit',  startDate: fmt(now - 6 * DAY),  status: 'in_progress', currentDay: 5, days: mkDays(4) },
+      { id: 'ts-alex',   userId: 'user-alex',   traineeName: 'Alex Nguyen',     trainerName: 'Jordan Reyes',    userEmail: 'alex@tedshotdogs.com',   storeId: 'store-sheridan', startDate: fmt(now - 2 * DAY),  status: 'in_progress', currentDay: 2, days: mkDays(1) },
+    ];
+    save(KEYS.trainingSessions, trainingSessions);
+  }
+
+  // Seed some audit entries so the activity feed isn't empty on first open
+  if (auditLog.length === 0) {
+    const entries = [
+      { event: 'login',              userName: 'Owner / Admin',     userId: 'user-owner', daysAgo: 0.1, details: { role: 'admin' } },
+      { event: 'announcement',       userName: 'Cody McCormick',    userId: 'dir-7',      daysAgo: 2,   details: { title: 'Summer Hours Extended at Main Street & Transit' } },
+      { event: 'sopEdit',            userName: 'Marco Rodriguez',   userId: 'user-marco', daysAgo: 3,   details: { title: 'Taking an Order', cat: 'Cash' } },
+      { event: 'trainingComplete',   userName: 'Tyler Morrison',    userId: 'user-tyler', daysAgo: 1,   details: { title: 'Tyler Morrison' } },
+      { event: 'trainingDaySubmit',  userName: 'Briana Sullivan',   userId: 'user-brie',  daysAgo: 1,   details: { day: 4, title: 'Cooking Basics' } },
+      { event: 'docUpload',          userName: 'Sarah Chen',        userId: 'user-sarah', daysAgo: 4,   details: { name: 'Summer Schedule Template.xlsx', folder: 'Operations' } },
+      { event: 'announcementAck',    userName: 'Jessica Park',      userId: 'user-jess',  daysAgo: 2,   details: { title: 'Summer Hours Extended at Main Street & Transit' } },
+      { event: 'quizPass',           userName: 'Tyler Morrison',    userId: 'user-tyler', daysAgo: 1,   details: { day: 9, score: 100 } },
+      { event: 'storeEdit',          userName: 'Owner / Admin',     userId: 'user-owner', daysAgo: 5,   details: { title: 'Transit Road' } },
+      { event: 'settingsChange',     userName: 'Owner / Admin',     userId: 'user-owner', daysAgo: 7,   details: { title: 'Email triggers updated' } },
+    ];
+    auditLog = entries.map((e, i) => ({
+      id: 'a-seed-' + i,
+      ts: new Date(now - e.daysAgo * DAY).toISOString(),
+      event: e.event, details: e.details,
+      userId: e.userId, userName: e.userName,
+      userEmail: (users.find(u => u.id === e.userId)?.email) || null,
+    }));
+    save('teds-hub-audit-log', auditLog);
   }
 }
 
@@ -2950,7 +3172,7 @@ function renderSOPs() {
       <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}${hasVideo ? '<span class="custom-tag" style="background:#e8f4ff;color:#1a66c5">▶ VIDEO</span>' : ''}</div>
       <h4>${s.title}</h4>
       <p>${s.desc}</p>
-      <div class="footer"><span>${hasVideo ? '🎬 Video + procedure' : '📄 Procedure'}</span><span>View →</span></div>
+      <div class="footer"><span>${hasVideo ? '<i data-lucide="film" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px"></i> Video + procedure' : '<i data-lucide="file-text" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px"></i> Procedure'}</span><span>View →</span></div>
     </div>`;
   }).join('');
   document.getElementById('statSops').textContent = all.length;
@@ -3846,7 +4068,7 @@ function renderDirectory() {
           <div class="role-tag">${c.role}</div>
           <div class="contact">
             ${c.phone ? `<div><i data-lucide="phone" style="width:13px;height:13px;vertical-align:-2px;color:var(--ted-muted);margin-right:4px"></i>${c.phone}</div>` : ''}
-            ${c.email ? `<div>✉️ ${c.email}</div>` : ''}
+            ${c.email ? `<div><i data-lucide="mail" style="width:13px;height:13px;vertical-align:-2px;color:var(--ted-muted);margin-right:4px"></i>${c.email}</div>` : ''}
             <div><i data-lucide="store" style="width:13px;height:13px;vertical-align:-2px;color:var(--ted-muted);margin-right:4px"></i>${store}</div>
           </div>
         </div>
@@ -4984,6 +5206,28 @@ function initIcons() {
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     try { window.lucide.createIcons(); } catch (e) { /* silent */ }
   }
+}
+
+// ============ DEMO MODE BANNER ============
+// Set IS_DEMO to false when the production rollout happens — the whole
+// banner + body class will vanish and the topbar will sit flush with the
+// top of the viewport.
+const IS_DEMO = true;
+(function setupDemoBanner() {
+  const banner = document.getElementById('demoBanner');
+  if (!banner) return;
+  if (!IS_DEMO) { banner.remove(); return; }
+  document.body.classList.add('demo-active');
+  if (sessionStorage.getItem('teds-hub-demo-dismissed') === '1') {
+    banner.classList.add('hidden');
+    document.body.classList.remove('demo-active');
+  }
+})();
+function dismissDemoBanner() {
+  const banner = document.getElementById('demoBanner');
+  if (banner) banner.classList.add('hidden');
+  document.body.classList.remove('demo-active');
+  sessionStorage.setItem('teds-hub-demo-dismissed', '1');
 }
 
 // ============ INIT ============
