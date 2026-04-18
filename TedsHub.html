@@ -1026,6 +1026,9 @@
   /* ============ ADMIN DASHBOARD ============ */
   body.is-admin .admin-dashboard { display: block !important; }
   body.is-admin .admin-dashboard-bottom { display: block !important; }
+  /* Extra defense: non-admins should never see the settings page content,
+     even if a stray goTo('settings') slipped through. */
+  body:not(.is-admin) #page-settings { display: none !important; }
   .kpi-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
   }
@@ -3093,7 +3096,17 @@ function renderStoreSwitcher() {
 }
 
 // ============ NAVIGATION ============
+// Pages that require specific roles. Non-matching users get redirected home.
+const PAGE_GUARDS = {
+  settings: (u) => u?.role === 'admin',
+};
+
 function goTo(page) {
+  // Route guard — e.g. settings is admin-only
+  if (PAGE_GUARDS[page] && !PAGE_GUARDS[page](currentUser)) {
+    alert("You don't have permission to access that page. Only admins can open Settings. Sign out and use the Admin PIN if you need access.");
+    page = 'home';
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const target = document.getElementById('page-' + page);
