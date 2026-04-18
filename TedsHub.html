@@ -829,6 +829,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 22px; margin: 0 auto 10px;
   }
+  .career-step .icon-big [data-lucide] { width: 24px; height: 24px; stroke-width: 2; color: white; }
   .career-step h4 {
     font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px;
@@ -1524,7 +1525,7 @@
     </div>
 
     <div class="demo-banner">
-      🔒 <strong>Demo authentication.</strong> Users are stored in this browser only (localStorage). For real multi-device security you'd need a backend — ask Mason.
+      <i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"></i> <strong>Demo authentication.</strong> Users are stored in this browser only (localStorage). For real multi-device security you'd need a backend — ask Mason.
     </div>
 
     <div id="firstRunNotice" class="first-run" style="display:none">
@@ -1776,7 +1777,7 @@
           <input type="text" class="local-search" id="docSearch" placeholder="Search documents…">
         </div>
         <button class="btn btn-ghost upload-only" onclick="openNewFolderPrompt()"><i data-lucide="folder-plus"></i> New Folder</button>
-        <button class="btn btn-primary upload-only" onclick="openUploadModal()">⬆ Upload Files</button>
+        <button class="btn btn-primary upload-only" onclick="openUploadModal()"><i data-lucide="upload"></i> Upload Files</button>
       </div>
 
       <table class="doc-table">
@@ -1838,12 +1839,12 @@
       <p class="page-subtitle">Your path from Team Member all the way to District Manager.</p>
 
       <div class="career-ladder">
-        <div class="career-step"><div class="icon-big">👤</div><h4>Team Member</h4><ul><li>Delivers exceptional guest experiences</li><li>Demonstrates our values and traits</li><li>Maintains health & safety standards</li><li>Practices good communication</li></ul></div>
-        <div class="career-step"><div class="icon-big">📋</div><h4>Certified Trainer</h4><ul><li>Mastered all Team Member skills</li><li>Trains new hires using the guide</li><li>Models Ted's values daily</li></ul></div>
-        <div class="career-step"><div class="icon-big">🔥</div><h4>Grill Master</h4><ul><li>Masters the 900° charcoal grill</li><li>Cooks to order with precision</li><li>Upholds quality standards</li></ul></div>
-        <div class="career-step"><div class="icon-big">📝</div><h4>Shift Lead</h4><ul><li>Key holder position</li><li>Assists daily store operations</li><li>Monitors & updates inventory</li><li>Food Safety Manager Certified</li></ul></div>
-        <div class="career-step"><div class="icon-big">🤝</div><h4>Assistant GM</h4><ul><li>Drives KPIs through operations</li><li>Supports P&L management</li><li>Coaches team & shift leads</li></ul></div>
-        <div class="career-step"><div class="icon-big">🏪</div><h4>General Manager</h4><ul><li>Leads with passion for food quality</li><li>Strategizes sales growth</li><li>Builds ideal teams</li><li>Owns P&L and inventory</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="user"></i></div><h4>Team Member</h4><ul><li>Delivers exceptional guest experiences</li><li>Demonstrates our values and traits</li><li>Maintains health & safety standards</li><li>Practices good communication</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="clipboard-check"></i></div><h4>Certified Trainer</h4><ul><li>Mastered all Team Member skills</li><li>Trains new hires using the guide</li><li>Models Ted's values daily</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="flame"></i></div><h4>Grill Master</h4><ul><li>Masters the 900° charcoal grill</li><li>Cooks to order with precision</li><li>Upholds quality standards</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="key-round"></i></div><h4>Shift Lead</h4><ul><li>Key holder position</li><li>Assists daily store operations</li><li>Monitors & updates inventory</li><li>Food Safety Manager Certified</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="handshake"></i></div><h4>Assistant GM</h4><ul><li>Drives KPIs through operations</li><li>Supports P&L management</li><li>Coaches team & shift leads</li></ul></div>
+        <div class="career-step"><div class="icon-big"><i data-lucide="store"></i></div><h4>General Manager</h4><ul><li>Leads with passion for food quality</li><li>Strategizes sales growth</li><li>Builds ideal teams</li><li>Owns P&L and inventory</li></ul></div>
       </div>
 
       <div class="grid-2">
@@ -2026,10 +2027,10 @@
           <div class="card-title">Data Management</div>
           <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">All Ted's Hub data (users, stores, SOPs, checklist progress, directory) is stored locally in this browser. Use these actions to export, import, or reset.</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn btn-ghost" onclick="exportData()">⬇️ Export All Data</button>
-            <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">⬆️ Import Data</button>
+            <button class="btn btn-ghost" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()"><i data-lucide="upload"></i> Import Data</button>
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-            <button class="btn btn-danger" onclick="resetAllData()">🗑️ Reset All Data</button>
+            <button class="btn btn-danger" onclick="resetAllData()"><i data-lucide="trash-2"></i> Reset All Data</button>
           </div>
         </div>
       </div>
@@ -2945,7 +2946,7 @@ function renderSOPs() {
     const hasVideo = !!toEmbedUrl(s.videoUrl);
     return `
     <div class="sop-card" onclick="openSOP('${s.id}')">
-      <button class="edit-btn" onclick="event.stopPropagation();openSOPEditor('${s.id}')">✏️</button>
+      <button class="edit-btn" onclick="event.stopPropagation();openSOPEditor('${s.id}')"><i data-lucide="pencil"></i></button>
       <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}${hasVideo ? '<span class="custom-tag" style="background:#e8f4ff;color:#1a66c5">▶ VIDEO</span>' : ''}</div>
       <h4>${s.title}</h4>
       <p>${s.desc}</p>
@@ -3134,7 +3135,7 @@ function renderDocFolders() {
     ...docFolders.map(f => ({ name: f, count: docs.filter(d => d.folder === f).length }))];
   row.innerHTML = all.map(f => `
     <div class="folder ${activeFolder === f.name ? 'active' : ''}" onclick="setFolder('${f.name.replace(/'/g,"\\'")}')">
-      <div class="ico">${f.name === 'All' ? '📂' : '📁'}</div>
+      <div class="ico"><i data-lucide="${f.name === 'All' ? 'folder-open' : 'folder'}"></i></div>
       <div><div class="name">${f.name}</div><div class="count">${f.count} file${f.count === 1 ? '' : 's'}</div></div>
     </div>
   `).join('');
@@ -3180,8 +3181,8 @@ function renderDocs() {
         : (d.file ? `onclick="window.open('${d.file}','_blank')"` : `onclick="samplePlaceholderNotice()"`);
       const actions = d.uploaded
         ? `<div class="doc-row-actions">
-             <button class="icon-btn" title="Download" onclick="event.stopPropagation();downloadUploadedDoc('${d.id}')">⬇</button>
-             <button class="icon-btn danger upload-only" title="Delete" onclick="event.stopPropagation();deleteUploadedDoc('${d.id}')">🗑</button>
+             <button class="icon-btn" title="Download" onclick="event.stopPropagation();downloadUploadedDoc('${d.id}')"><i data-lucide="download"></i></button>
+             <button class="icon-btn danger upload-only" title="Delete" onclick="event.stopPropagation();deleteUploadedDoc('${d.id}')"><i data-lucide="trash-2"></i></button>
            </div>`
         : `<div class="doc-row-actions">${d.file ? `<button class="icon-btn" title="Open" onclick="event.stopPropagation();window.open('${d.file}','_blank')">↗</button>` : ''}</div>`;
       return `<tr ${openAttr}>
@@ -3440,7 +3441,7 @@ function renderSessionTimeline(view) {
     const isClickable = status !== 'locked';
     return `<div class="timeline-step ${status}" data-day="${d.day}" ${isClickable ? `onclick="activeTrainingDay=${d.day};renderTraining()"` : 'style="cursor:not-allowed"'}>
       <div class="step-num">${d.day}</div>
-      <div class="step-icon">${status === 'submitted' ? '✓' : status === 'active' ? '→' : '🔒'}</div>
+      <div class="step-icon">${status === 'submitted' ? '<i data-lucide="check" style="width:14px;height:14px"></i>' : status === 'active' ? '<i data-lucide="arrow-right" style="width:14px;height:14px"></i>' : '<i data-lucide="lock" style="width:12px;height:12px"></i>'}</div>
     </div>`;
   }).join('');
 
@@ -3553,7 +3554,7 @@ function renderDayDetail(view) {
     </div>
   ` : `
     <div class="day-actions">
-      <button class="btn btn-ghost" onclick="saveTrainingDay('${ts.id}', ${activeTrainingDay})">💾 Save Draft</button>
+      <button class="btn btn-ghost" onclick="saveTrainingDay('${ts.id}', ${activeTrainingDay})"><i data-lucide="save"></i> Save Draft</button>
       <button class="btn btn-primary" onclick="submitTrainingDay('${ts.id}', ${activeTrainingDay})">Submit Day ${activeTrainingDay}</button>
     </div>
   `;
@@ -3838,15 +3839,15 @@ function renderDirectory() {
     grid.innerHTML = list.map(c => {
       const store = stores.find(s => s.id === c.storeId)?.name || '—';
       return `<div class="dir-card">
-        <button class="edit-btn" onclick="openContactEditor('${c.id}')">✏️</button>
+        <button class="edit-btn" onclick="openContactEditor('${c.id}')"><i data-lucide="pencil"></i></button>
         <div class="dir-avatar">${c.name[0]?.toUpperCase() || '?'}</div>
         <div class="dir-info">
           <div class="name">${c.name}</div>
           <div class="role-tag">${c.role}</div>
           <div class="contact">
-            ${c.phone ? `<div>📱 ${c.phone}</div>` : ''}
+            ${c.phone ? `<div><i data-lucide="phone" style="width:13px;height:13px;vertical-align:-2px;color:var(--ted-muted);margin-right:4px"></i>${c.phone}</div>` : ''}
             ${c.email ? `<div>✉️ ${c.email}</div>` : ''}
-            <div>🏪 ${store}</div>
+            <div><i data-lucide="store" style="width:13px;height:13px;vertical-align:-2px;color:var(--ted-muted);margin-right:4px"></i>${store}</div>
           </div>
         </div>
       </div>`;
@@ -3939,7 +3940,7 @@ function renderAuditLog() {
   const allowedEvents = filterVal ? filterVal.split(',') : null;
   const items = auditLog.slice().reverse().filter(a => !allowedEvents || allowedEvents.includes(a.event));
   if (!items.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><div style="font-size:40px;margin-bottom:8px">📋</div><div>No audit events match your filter.</div></div>';
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><i data-lucide="clipboard-list" style="width:40px;height:40px;margin-bottom:8px"></i><div>No audit events match your filter.</div></div>';
     return;
   }
   el.innerHTML = items.map(a => {
@@ -4061,7 +4062,7 @@ function sendTestEmail() {
 function renderEmailLog() {
   const el = document.getElementById('emailLogList');
   if (!emailLog.length) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><div style="font-size:40px;margin-bottom:8px">📭</div><div>No emails sent yet.</div></div>';
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ted-muted)"><i data-lucide="inbox" style="width:40px;height:40px;margin-bottom:8px"></i><div>No emails sent yet.</div></div>';
     return;
   }
   el.innerHTML = emailLog.slice().reverse().map(e => `
@@ -4144,18 +4145,18 @@ function renderStoreList() {
   const el = document.getElementById('storeList');
   el.innerHTML = stores.map(s => {
     const leadersCount = (s.leaderEmails || []).length;
-    const emailBit = s.email ? `📧 ${s.email}` : '<span style="color:#c77">No store email</span>';
+    const emailBit = s.email ? `<i data-lucide="mail" style="width:11px;height:11px;vertical-align:-1px;margin-right:3px"></i>${s.email}` : '<span style="color:#c77">No store email</span>';
     const leadersBit = leadersCount ? ` · 👥 ${leadersCount} leader${leadersCount===1?'':'s'}` : '';
     return `
     <div class="settings-row">
-      <div style="font-size:20px">🏪</div>
+      <i data-lucide="store" style="width:20px;height:20px;color:var(--ted-red)"></i>
       <div class="meta">
         <div class="name">${s.name}</div>
         <div class="sub">${s.address || '—'} ${s.manager ? '· GM: ' + s.manager : ''}</div>
         <div class="sub" style="margin-top:3px;font-size:11px">${emailBit}${leadersBit}</div>
       </div>
       <div class="actions">
-        <button class="icon-btn-sm" onclick="openStoreEditor('${s.id}')" title="Edit">✏️</button>
+        <button class="icon-btn-sm" onclick="openStoreEditor('${s.id}')" title="Edit"><i data-lucide="pencil"></i></button>
       </div>
     </div>`;
   }).join('');
@@ -4218,7 +4219,7 @@ function renderUserList() {
         <div class="sub">${u.email} · ${ROLE_LABELS[u.role]} · ${storeName}</div>
       </div>
       <div class="actions">
-        <button class="icon-btn-sm" onclick="openUserEditor('${u.id}')" title="Edit">✏️</button>
+        <button class="icon-btn-sm" onclick="openUserEditor('${u.id}')" title="Edit"><i data-lucide="pencil"></i></button>
       </div>
     </div>`;
   }).join('');
@@ -4358,7 +4359,7 @@ async function resetAllData() {
     // SOPs
     (typeof effectiveSOPs === 'function' ? effectiveSOPs() : []).forEach(s => {
       const hay = (s.title + ' ' + (s.desc || '') + ' ' + (s.cat || '') + ' ' + stripHtml(s.body)).toLowerCase();
-      if (hay.includes(query)) out.sops.push({ type: 'sop', icon: '📋', title: s.title, sub: s.cat + (s.desc ? ' — ' + s.desc : ''), action: () => { goTo('sops'); setTimeout(() => { if (typeof openSOP === 'function') openSOP(s.id); }, 50); } });
+      if (hay.includes(query)) out.sops.push({ type: 'sop', icon: '<i data-lucide="clipboard-list"></i>', title: s.title, sub: s.cat + (s.desc ? ' — ' + s.desc : ''), action: () => { goTo('sops'); setTimeout(() => { if (typeof openSOP === 'function') openSOP(s.id); }, 50); } });
     });
     // Documents (baseline + uploaded)
     const baseDocs = (typeof BASE_DOCS !== 'undefined' ? BASE_DOCS : []);
@@ -4367,32 +4368,32 @@ async function resetAllData() {
       const name = d.name || '';
       const folder = d.folder || '';
       if ((name + ' ' + folder).toLowerCase().includes(query)) {
-        out.docs.push({ type: 'doc', icon: '📁', title: name, sub: folder + (d.size ? ' · ' + (typeof fmtSize === 'function' && typeof d.size === 'number' ? fmtSize(d.size) : d.size) : ''), action: () => goTo('documents') });
+        out.docs.push({ type: 'doc', icon: '<i data-lucide="folder"></i>', title: name, sub: folder + (d.size ? ' · ' + (typeof fmtSize === 'function' && typeof d.size === 'number' ? fmtSize(d.size) : d.size) : ''), action: () => goTo('documents') });
       }
     });
     // Contacts (directory)
     (typeof directory !== 'undefined' ? directory : []).forEach(c => {
       if ((c.name + ' ' + (c.role || '') + ' ' + (c.email || '')).toLowerCase().includes(query)) {
-        out.contacts.push({ type: 'contact', icon: '👤', title: c.name, sub: (c.role || '') + (c.email ? ' · ' + c.email : ''), action: () => goTo('directory') });
+        out.contacts.push({ type: 'contact', icon: '<i data-lucide="user"></i>', title: c.name, sub: (c.role || '') + (c.email ? ' · ' + c.email : ''), action: () => goTo('directory') });
       }
     });
     // Announcements
     (typeof announcements !== 'undefined' ? announcements : []).forEach(a => {
       if ((a.title + ' ' + a.body).toLowerCase().includes(query)) {
-        out.announcements.push({ type: 'ann', icon: '📢', title: a.title, sub: 'Announcement — ' + (a.author || 'Team'), action: () => goTo('home') });
+        out.announcements.push({ type: 'ann', icon: '<i data-lucide="megaphone"></i>', title: a.title, sub: 'Announcement — ' + (a.author || 'Team'), action: () => goTo('home') });
       }
     });
     // Pages
     const pages = [
-      { name: 'Home', id: 'home', icon: '🏠' },
-      { name: 'Our Values', id: 'values', icon: '⭐' },
-      { name: 'SOP Library', id: 'sops', icon: '📋' },
-      { name: 'Documents', id: 'documents', icon: '📁' },
-      { name: 'Team Directory', id: 'directory', icon: '📇' },
-      { name: 'Training Tracker', id: 'checklists', icon: '✅' },
-      { name: '9-Day Schedule', id: 'training', icon: '🎓' },
-      { name: 'Career Path', id: 'career', icon: '📈' },
-      { name: 'Settings', id: 'settings', icon: '⚙️', adminOnly: true },
+      { name: 'Home', id: 'home', icon: '<i data-lucide="home"></i>' },
+      { name: 'Our Values', id: 'values', icon: '<i data-lucide="star"></i>' },
+      { name: 'SOP Library', id: 'sops', icon: '<i data-lucide="clipboard-list"></i>' },
+      { name: 'Documents', id: 'documents', icon: '<i data-lucide="folder"></i>' },
+      { name: 'Team Directory', id: 'directory', icon: '<i data-lucide="contact"></i>' },
+      { name: 'Training Tracker', id: 'checklists', icon: '<i data-lucide="list-checks"></i>' },
+      { name: '9-Day Schedule', id: 'training', icon: '<i data-lucide="graduation-cap"></i>' },
+      { name: 'Career Path', id: 'career', icon: '<i data-lucide="trending-up"></i>' },
+      { name: 'Settings', id: 'settings', icon: '<i data-lucide="settings"></i>', adminOnly: true },
     ];
     pages.forEach(p => {
       if (p.adminOnly && !document.body.classList.contains('is-admin')) return;
@@ -4448,6 +4449,7 @@ async function resetAllData() {
     results._focused = 0;
     refreshFocus();
     results.classList.add('open');
+    if (window.lucide) window.lucide.createIcons();
   }
 
   function refreshFocus() {
@@ -4663,14 +4665,16 @@ function clearAuditLog() {
   if (typeof renderAuditLog === 'function') renderAuditLog();
 }
 const AUDIT_ICONS = {
-  login: '🔓', logout: '🚪', sopCreate: '📋', sopEdit: '✏️', sopDelete: '🗑️',
-  announcement: '📢', announcementAck: '✅', docUpload: '📁', docDelete: '🗑️',
-  trainingStart: '🎓', trainingDaySubmit: '✅', trainingComplete: '🏆',
-  userAdd: '👤', userEdit: '✏️', userDelete: '🗑️',
-  storeAdd: '🏪', storeEdit: '✏️', storeDelete: '🗑️',
-  settingsChange: '⚙️', import: '⬆️', export: '⬇️', reset: '🧨',
-  contactAdd: '📇', contactEdit: '✏️', contactDelete: '🗑️',
-  quizPass: '🎯', quizFail: '❌',
+  login: '<i data-lucide="log-in"></i>', logout: '<i data-lucide="log-out"></i>',
+  sopCreate: '<i data-lucide="clipboard-list"></i>', sopEdit: '<i data-lucide="pencil"></i>', sopDelete: '<i data-lucide="trash-2"></i>',
+  announcement: '<i data-lucide="megaphone"></i>', announcementAck: '<i data-lucide="check"></i>',
+  docUpload: '<i data-lucide="upload"></i>', docDelete: '<i data-lucide="trash-2"></i>',
+  trainingStart: '<i data-lucide="graduation-cap"></i>', trainingDaySubmit: '<i data-lucide="check"></i>', trainingComplete: '<i data-lucide="trophy"></i>',
+  userAdd: '<i data-lucide="user-plus"></i>', userEdit: '<i data-lucide="pencil"></i>', userDelete: '<i data-lucide="user-x"></i>',
+  storeAdd: '<i data-lucide="store"></i>', storeEdit: '<i data-lucide="pencil"></i>', storeDelete: '<i data-lucide="trash-2"></i>',
+  settingsChange: '<i data-lucide="settings"></i>', import: '<i data-lucide="upload"></i>', export: '<i data-lucide="download"></i>', reset: '<i data-lucide="alert-triangle"></i>',
+  contactAdd: '<i data-lucide="user-plus"></i>', contactEdit: '<i data-lucide="pencil"></i>', contactDelete: '<i data-lucide="user-x"></i>',
+  quizPass: '<i data-lucide="target"></i>', quizFail: '<i data-lucide="x-circle"></i>',
 };
 function auditLabel(e) {
   const labels = {
@@ -4736,7 +4740,7 @@ function submitQuiz() {
   const body = document.getElementById('quizBody');
   body.innerHTML = `
     <div style="text-align:center;padding:30px 20px">
-      <div style="font-size:48px;margin-bottom:10px">${passed ? '🎯' : '❌'}</div>
+      <div style="margin-bottom:10px"><i data-lucide="${passed ? 'target' : 'x-circle'}" style="width:56px;height:56px;color:${passed ? 'var(--ted-success)' : 'var(--ted-red)'};stroke-width:1.5"></i></div>
       <div style="font-family:'Oswald',sans-serif;font-size:26px;color:${passed ? 'var(--ted-success)' : 'var(--ted-red)'};font-weight:700;margin-bottom:8px">
         ${passed ? 'You passed!' : 'Not quite there'}
       </div>
@@ -4866,13 +4870,13 @@ function renderQuizAdminList() {
     const qs = quizzes[d] || [];
     return `
       <div class="settings-row">
-        <div style="font-size:20px">🎯</div>
+        <i data-lucide="target" style="width:20px;height:20px;color:var(--ted-red)"></i>
         <div class="meta">
           <div class="name">Day ${d} — ${scheduleTitle}</div>
           <div class="sub">${qs.length ? qs.length + ' question' + (qs.length===1?'':'s') : 'No quiz — users can submit without a knowledge check'}</div>
         </div>
         <div class="actions">
-          <button class="btn btn-sm btn-ghost" onclick="openQuizEditor(${d})">${qs.length ? '✏️ Edit' : '+ Add Quiz'}</button>
+          <button class="btn btn-sm btn-ghost" onclick="openQuizEditor(${d})">${qs.length ? '<i data-lucide=\'pencil\'></i> Edit' : '<i data-lucide=\'plus\'></i> Add Quiz'}</button>
         </div>
       </div>
     `;
