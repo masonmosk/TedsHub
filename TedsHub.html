@@ -1025,6 +1025,7 @@
 
   /* ============ ADMIN DASHBOARD ============ */
   body.is-admin .admin-dashboard { display: block !important; }
+  body.is-admin .admin-dashboard-bottom { display: block !important; }
   .kpi-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
   }
@@ -1761,16 +1762,6 @@
           <div class="kpi-card"><div class="kpi-label">Documents Added (7d)</div><div class="kpi-value" id="kpiNewDocs">—</div><div class="kpi-sub" id="kpiNewDocsSub">—</div></div>
         </div>
 
-        <div class="dashboard-row">
-          <div class="card" style="flex:1">
-            <div class="card-title" style="margin-bottom:10px">Training Progress by Store</div>
-            <div id="storeProgressList"></div>
-          </div>
-          <div class="card" style="flex:1">
-            <div class="card-title" style="margin-bottom:10px">Recent Activity</div>
-            <div id="dashRecentActivity"></div>
-          </div>
-        </div>
       </div>
 
       <!-- Announcements Board — full width -->
@@ -1843,6 +1834,21 @@
           <h3>Admin Settings</h3>
           <p>Manage stores, users, and organization-wide data and configuration.</p>
           <div class="meta">Open Settings →</div>
+        </div>
+      </div>
+
+      <!-- Admin-only dashboard row at the bottom of the home page -->
+      <div class="admin-only admin-dashboard-bottom" style="margin-top:28px;display:none">
+        <div class="home-section-label">OPERATIONS INSIGHT</div>
+        <div class="dashboard-row">
+          <div class="card" style="flex:1">
+            <div class="card-title" style="margin-bottom:10px">Training Progress by Store</div>
+            <div id="storeProgressList"></div>
+          </div>
+          <div class="card" style="flex:1">
+            <div class="card-title" style="margin-bottom:10px">Recent Activity</div>
+            <div id="dashRecentActivity"></div>
+          </div>
         </div>
       </div>
     </section>
