@@ -18,9 +18,45 @@
     --ted-muted: #6B6B6B;
     --ted-border: #E3DED5;
     --ted-success: #2D7D46;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
-    --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
-    --shadow-lg: 0 6px 24px rgba(0,0,0,0.12);
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 10px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.10), 0 4px 10px rgba(0,0,0,0.06);
+    --shadow-xl: 0 24px 60px rgba(0,0,0,0.16), 0 8px 20px rgba(0,0,0,0.08);
+
+    /* Typography scale (modular, 1.2 ratio) */
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-base: 14px;
+    --text-md: 15px;
+    --text-lg: 17px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 30px;
+    --text-4xl: 40px;
+    --text-5xl: 52px;
+    --leading-tight: 1.2;
+    --leading-snug: 1.35;
+    --leading-normal: 1.55;
+    --leading-relaxed: 1.7;
+    --track-tight: -0.02em;
+    --track-normal: 0;
+    --track-wide: 0.05em;
+    --track-wider: 0.1em;
+
+    /* Radii */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    /* Motion */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+    --dur-slow: 380ms;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -1162,9 +1198,321 @@
   .hero-stat [data-lucide] { width: 20px; height: 20px; margin-bottom: 4px; color: var(--ted-gold); }
   /* Hide the "before" emoji search prefix once icon is injected */
   .search-wrap.has-icon::before { content: none; }
+
+  /* ============ TYPOGRAPHY HIERARCHY ============ */
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    letter-spacing: var(--track-normal);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Oswald', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    letter-spacing: var(--track-tight);
+    line-height: var(--leading-tight);
+    color: var(--ted-text);
+  }
+  .page-title {
+    font-family: 'Bebas Neue', 'Oswald', sans-serif !important;
+    font-size: var(--text-4xl) !important;
+    font-weight: 500 !important;
+    letter-spacing: var(--track-wide) !important;
+    line-height: 1.05 !important;
+    color: var(--ted-text) !important;
+    margin-bottom: 4px !important;
+  }
+  .page-subtitle { font-size: var(--text-base); color: var(--ted-muted); line-height: var(--leading-snug); margin-bottom: 18px; }
+  .breadcrumb { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--track-wider); font-weight: 600; color: var(--ted-muted); }
+  .breadcrumb span { color: var(--ted-red); }
+  .card-title {
+    font-family: 'Oswald', 'Inter', sans-serif; font-size: var(--text-lg);
+    font-weight: 600; letter-spacing: var(--track-tight); line-height: var(--leading-tight);
+  }
+  .home-section-label {
+    font-size: var(--text-xs); font-weight: 700; color: var(--ted-muted);
+    text-transform: uppercase; letter-spacing: var(--track-wider);
+    margin: 20px 0 12px;
+  }
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif !important;
+    font-size: var(--text-5xl) !important; letter-spacing: var(--track-wide) !important;
+    line-height: 1 !important; font-weight: 500 !important;
+  }
+  .hero p { font-size: var(--text-md); line-height: var(--leading-snug); opacity: 0.92; }
+
+  /* ============ CARD REFINEMENT ============ */
+  .card {
+    background: var(--ted-white);
+    border: 1px solid var(--ted-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+  .quick-card {
+    background: var(--ted-white);
+    border: 1px solid var(--ted-border);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base);
+    position: relative;
+    overflow: hidden;
+  }
+  .quick-card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+    background: linear-gradient(90deg, var(--ted-red), var(--ted-gold));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .quick-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--ted-border);
+  }
+  .quick-card:hover::before { transform: scaleX(1); }
+  .quick-card h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 10px 0 4px;
+    letter-spacing: var(--track-tight);
+  }
+  .quick-card p { font-size: var(--text-sm); line-height: var(--leading-snug); color: var(--ted-muted); }
+  .quick-card .meta {
+    font-size: var(--text-xs); font-weight: 700; color: var(--ted-red);
+    text-transform: uppercase; letter-spacing: var(--track-wider);
+    margin-top: 14px;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .quick-card:hover .meta { transform: translateX(3px); }
+
+  .sop-card {
+    background: var(--ted-white);
+    border: 1px solid var(--ted-border);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    cursor: pointer;
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out), border-color var(--dur-base);
+    position: relative;
+  }
+  .sop-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--ted-red);
+  }
+  .sop-card h4 {
+    font-size: var(--text-md); font-weight: 600;
+    letter-spacing: var(--track-tight); margin: 8px 0 4px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ============ BUTTON REFINEMENT ============ */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    font-size: var(--text-sm); font-weight: 600;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1;
+    white-space: nowrap;
+    transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast),
+                transform var(--dur-fast), box-shadow var(--dur-fast);
+    user-select: none;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139,0,0,0.25);
+  }
+  .btn-sm { padding: 7px 12px; font-size: var(--text-xs); gap: 4px; }
+  .btn-primary {
+    background: var(--ted-red); color: white;
+    box-shadow: 0 1px 2px rgba(139,0,0,0.25);
+  }
+  .btn-primary:hover {
+    background: var(--ted-red-dark);
+    box-shadow: 0 4px 10px rgba(139,0,0,0.28);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(139,0,0,0.25); }
+  .btn-ghost {
+    background: transparent; color: var(--ted-text);
+    border: 1px solid var(--ted-border);
+  }
+  .btn-ghost:hover {
+    border-color: var(--ted-red); color: var(--ted-red);
+    background: var(--ted-cream);
+  }
+  .btn-danger {
+    background: transparent; color: #B00020;
+    border: 1px solid #E8B8B8;
+  }
+  .btn-danger:hover { background: #FFF0F0; border-color: #B00020; }
+
+  .icon-btn, .icon-btn-sm {
+    transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast);
+  }
+  .icon-btn:hover { transform: scale(1.05); }
+  .icon-btn:active { transform: scale(0.96); }
+
+  /* ============ SKELETON LOADERS ============ */
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg,
+      var(--ted-border) 0%,
+      rgba(255,255,255,0.6) 50%,
+      var(--ted-border) 100%);
+    background-size: 200px 100%;
+    background-repeat: no-repeat;
+    border-radius: var(--radius-sm);
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+    display: inline-block;
+  }
+  body.dark .skeleton {
+    background: linear-gradient(90deg,
+      var(--ted-border) 0%,
+      rgba(255,255,255,0.08) 50%,
+      var(--ted-border) 100%);
+  }
+  .skeleton-line { height: 12px; border-radius: 4px; margin: 8px 0; }
+  .skeleton-title { height: 20px; width: 60%; border-radius: 4px; margin-bottom: 10px; }
+  .skeleton-card {
+    background: var(--ted-white); border: 1px solid var(--ted-border);
+    border-radius: var(--radius-md); padding: 18px; margin-bottom: 10px;
+    box-shadow: var(--shadow-xs);
+  }
+
+  /* Generic loading spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--ted-border); border-top-color: var(--ted-red);
+    animation: spin 0.7s linear infinite; display: inline-block;
+  }
+  .spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+
+  /* ============ MICRO-ANIMATIONS ============ */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page.active { animation: fadeIn var(--dur-slow) var(--ease-out); }
+  .modal-overlay.open .modal { animation: scaleIn var(--dur-base) var(--ease-out); }
+  .user-menu.open { animation: slideDown var(--dur-fast) var(--ease-out); }
+  .announcement { animation: slideUpFade var(--dur-base) var(--ease-out) both; }
+  .sop-card, .quick-card, .doc-row, .settings-row, .kpi-card {
+    animation: slideUpFade var(--dur-base) var(--ease-out) both;
+  }
+  /* Stagger nav items */
+  .nav-item { transition: background var(--dur-fast), color var(--dur-fast), border-left-color var(--dur-fast), padding-left var(--dur-fast); }
+  .nav-item:hover { padding-left: 24px; }
+
+  /* Form focus polish */
+  input, textarea, select {
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--ted-red) !important;
+    box-shadow: 0 0 0 3px rgba(139,0,0,0.15);
+  }
+
+  /* Smooth modal overlay */
+  .modal-overlay { transition: opacity var(--dur-base) var(--ease-out); }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ============ SPLASH SCREEN ============ */
+  #splash {
+    position: fixed; inset: 0; z-index: 2000;
+    background: linear-gradient(135deg, var(--ted-red-dark) 0%, var(--ted-red) 50%, var(--ted-red-bright) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white;
+    transition: opacity 400ms ease-out, visibility 400ms;
+  }
+  #splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+  #splash::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(232,166,40,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .splash-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 68px; letter-spacing: 4px;
+    line-height: 1; margin-bottom: 10px;
+    animation: splashFadeIn 600ms var(--ease-out);
+  }
+  .splash-tag {
+    font-size: var(--text-xs); letter-spacing: var(--track-wider);
+    text-transform: uppercase; opacity: 0.85;
+    color: var(--ted-gold); font-weight: 500;
+    animation: splashFadeIn 600ms var(--ease-out) 80ms both;
+  }
+  .splash-loader {
+    margin-top: 28px; width: 140px; height: 3px;
+    background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;
+    animation: splashFadeIn 600ms var(--ease-out) 200ms both;
+  }
+  .splash-loader::after {
+    content: ""; display: block; width: 40%; height: 100%;
+    background: var(--ted-gold);
+    animation: splashBar 1.2s ease-in-out infinite;
+  }
+  @keyframes splashFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splashBar {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(350%); }
+  }
+  body.dark #splash { filter: brightness(0.88); }
 </style>
 </head>
 <body>
+<!-- ============ BRANDED SPLASH ============ -->
+<div id="splash" role="status" aria-label="Loading Ted's Hub">
+  <div class="splash-logo">TED'S HUB</div>
+  <div class="splash-tag">Charcoal Grilled · Since 1927</div>
+  <div class="splash-loader"></div>
+</div>
 
 <!-- ============ LOGIN SCREEN ============ -->
 <div id="loginScreen">
@@ -2856,7 +3204,20 @@ function samplePlaceholderNotice() {
 }
 document.getElementById('docSearch').addEventListener('input', e => { docSearchTerm = e.target.value; renderDocs(); });
 
+function showDocsSkeleton() {
+  const grid = document.getElementById('docGrid') || document.getElementById('docList');
+  if (!grid) return;
+  grid.innerHTML = Array.from({ length: 4 }).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-line" style="width:90%"></div>
+      <div class="skeleton skeleton-line" style="width:60%"></div>
+    </div>
+  `).join('');
+}
+
 async function loadUploadedDocs() {
+  showDocsSkeleton();
   try {
     uploadedDocs = await dbGetAll();
   } catch (err) {
@@ -4633,6 +4994,22 @@ if (session?.userId && users.find(u => u.id === session.userId)) {
 } else {
   showLogin();
 }
+// Hide splash once the first paint is ready (min 600ms so it's perceivable)
+(function hideSplashWhenReady() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  const minShow = 600; // ms
+  const start = performance.now();
+  const done = () => {
+    const elapsed = performance.now() - start;
+    const delay = Math.max(0, minShow - elapsed);
+    setTimeout(() => splash.classList.add('hide'), delay);
+    // Remove from DOM after fade completes
+    setTimeout(() => splash.remove(), delay + 500);
+  };
+  if (document.readyState === 'complete') done();
+  else window.addEventListener('load', done, { once: true });
+})();
 </script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
