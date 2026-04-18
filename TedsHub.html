@@ -332,22 +332,29 @@
 
   /* ============ HOME / DASHBOARD ============ */
   .hero {
-    background: linear-gradient(135deg, var(--ted-red-dark) 0%, var(--ted-red) 60%, var(--ted-red-bright) 100%);
-    border-radius: 10px; padding: 36px 40px; color: white;
+    border-radius: 12px; padding: 44px 48px; color: white;
     margin-bottom: 28px; position: relative; overflow: hidden;
     box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--ted-red-dark) 0%, var(--ted-red) 60%, var(--ted-red-bright) 100%);
+    min-height: 220px;
+    display: flex; flex-direction: column; justify-content: center;
   }
+  /* Subtle tray photo texture — blended into the red, never a visible rectangle */
   .hero::after {
-    content: ""; position: absolute; right: -20px; top: 50%;
-    transform: translateY(-50%) rotate(-6deg);
-    width: 380px; height: 380px;
+    content: ""; position: absolute; inset: 0; pointer-events: none;
     background-image: url("./hero-tray.webp");
-    background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     background-position: center right;
-    opacity: 0.22;
-    pointer-events: none;
-    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+    background-repeat: no-repeat;
+    opacity: 0.18;
+    mix-blend-mode: overlay;
+  }
+  .hero > * { position: relative; z-index: 1; }
+  @media (max-width: 700px) {
+    .hero::after {
+      background-position: center right -40px;
+      opacity: 0.13;
+    }
   }
   @media (max-width: 700px) {
     .hero::after { width: 240px; height: 240px; right: -40px; opacity: 0.15; }
@@ -1748,7 +1755,6 @@
     <!-- HOME -->
     <section class="page active" id="page-home">
       <div class="hero">
-        <div class="hero-tag">CHARCOAL GRILLED · SINCE 1927</div>
         <h1>WELCOME TO TED'S HUB</h1>
         <p>Your one-stop portal for SOPs, documents, checklists, and training. Built for the team that treats every tray like a canvas.</p>
         <div class="hero-stats">
