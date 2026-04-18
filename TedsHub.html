@@ -592,7 +592,9 @@
   .file-badge {
     width: 32px; height: 32px; border-radius: 4px; background: var(--ted-cream);
     display: flex; align-items: center; justify-content: center; font-size: 14px;
+    color: var(--ted-red);
   }
+  .file-badge [data-lucide] { width: 16px; height: 16px; }
   .badge {
     display: inline-block; padding: 3px 8px; border-radius: 10px;
     font-size: 10px; font-weight: 600; text-transform: uppercase;
@@ -1216,10 +1218,14 @@
   body.dark main.content { background: var(--ted-bg); }
   body.dark aside.sidebar { background: #1f1c19; border-right-color: var(--ted-border); }
   body.dark .card, body.dark .quick-card, body.dark .sop-card, body.dark .doc-row,
+  body.dark .dir-card, body.dark .day-card, body.dark .ts-card,
   body.dark .modal, body.dark .settings-row, body.dark input, body.dark textarea,
   body.dark select, body.dark .login-card {
     background: var(--ted-white); color: var(--ted-text);
   }
+  body.dark .dir-info .name { color: var(--ted-text); }
+  body.dark .dir-info .contact { color: var(--ted-muted); }
+  body.dark .dir-info .role-tag { background: var(--ted-cream); color: var(--ted-red-bright); }
   body.dark input, body.dark textarea, body.dark select {
     border-color: var(--ted-border) !important;
   }
@@ -1256,6 +1262,38 @@
   body.dark .card-title, body.dark .page-title, body.dark h1, body.dark h2, body.dark h3, body.dark h4 { color: var(--ted-text); }
   body.dark .btn-ghost { background: transparent; color: var(--ted-text); border-color: var(--ted-border); }
   body.dark .btn-ghost:hover { background: var(--ted-cream); }
+
+  /* Dark mode — document table */
+  body.dark .doc-table {
+    background: var(--ted-white); border-color: var(--ted-border);
+  }
+  body.dark .doc-table thead { background: var(--ted-cream); }
+  body.dark .doc-table th, body.dark .doc-table td { color: var(--ted-text); border-color: var(--ted-border); }
+  body.dark .doc-table tbody tr:hover { background: var(--ted-cream); }
+
+  /* Dark mode — folder tabs */
+  body.dark .folder { background: var(--ted-white); border-color: var(--ted-border); }
+  body.dark .folder.active { background: #3b2d24; border-color: var(--ted-red); }
+  body.dark .folder .count { color: var(--ted-muted); }
+
+  /* Dark mode — SOP chips */
+  body.dark .chip { background: var(--ted-white); color: var(--ted-text); border-color: var(--ted-border); }
+  body.dark .chip:hover { border-color: var(--ted-red); color: var(--ted-red-bright); }
+  body.dark .chip.active { background: var(--ted-red); color: white; border-color: var(--ted-red); }
+
+  /* Dark mode — career ladder cards */
+  body.dark .career-step { background: var(--ted-white); border-color: var(--ted-border); }
+
+  /* Dark mode — training day cards */
+  body.dark .day-card, body.dark .ts-card, body.dark .schedule-grid .day-card {
+    background: var(--ted-white); border-color: var(--ted-border);
+  }
+
+  /* Dark mode — drop zone */
+  body.dark .drop-zone { background: var(--ted-cream); border-color: var(--ted-border); color: var(--ted-text); }
+
+  /* Dark mode — demo banner text links/strong */
+  body.dark #demoBanner { background: linear-gradient(90deg, #1a1412 0%, #2a1e18 100%); }
 
   /* ============ LUCIDE ICONS ============ */
   [data-lucide] { display: inline-block; vertical-align: -3px; stroke-width: 2; pointer-events: none; }
@@ -2758,14 +2796,15 @@ function badgeClassForType(type) {
 }
 function iconForType(type) {
   const t = (type || '').toUpperCase();
-  if (t === 'PDF') return '📕';
-  if (['DOC','DOCX','RTF','TXT','MD'].includes(t)) return '📘';
-  if (['XLS','XLSX','CSV','TSV'].includes(t)) return '📗';
-  if (['PNG','JPG','JPEG','GIF','SVG','WEBP','HEIC','BMP'].includes(t)) return '🖼';
-  if (['ZIP','RAR','7Z','TAR','GZ'].includes(t)) return '🗜';
-  if (['MP4','MOV','AVI','MKV','WEBM'].includes(t)) return '🎬';
-  if (['MP3','WAV','M4A','OGG'].includes(t)) return '🎵';
-  return '📄';
+  const L = (n) => `<i data-lucide="${n}"></i>`;
+  if (t === 'PDF') return L('file-text');
+  if (['DOC','DOCX','RTF','TXT','MD'].includes(t)) return L('file-text');
+  if (['XLS','XLSX','CSV','TSV'].includes(t)) return L('file-spreadsheet');
+  if (['PNG','JPG','JPEG','GIF','SVG','WEBP','HEIC','BMP'].includes(t)) return L('image');
+  if (['ZIP','RAR','7Z','TAR','GZ'].includes(t)) return L('file-archive');
+  if (['MP4','MOV','AVI','MKV','WEBM'].includes(t)) return L('film');
+  if (['MP3','WAV','M4A','OGG'].includes(t)) return L('music');
+  return L('file');
 }
 
 // ============ STATE ============
@@ -3215,7 +3254,7 @@ function renderSOPs() {
     return `
     <div class="sop-card" onclick="openSOP('${s.id}')">
       <button class="edit-btn" onclick="event.stopPropagation();openSOPEditor('${s.id}')"><i data-lucide="pencil"></i></button>
-      <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}${hasVideo ? '<span class="custom-tag" style="background:#e8f4ff;color:#1a66c5">▶ VIDEO</span>' : ''}</div>
+      <div class="cat">${s.cat}${isCustom ? '<span class="custom-tag">CUSTOM</span>' : ''}${hasVideo ? '<span class="custom-tag" style="background:#e8f4ff;color:#1a66c5"><i data-lucide="play" style="width:9px;height:9px;vertical-align:0"></i> VIDEO</span>' : ''}</div>
       <h4>${s.title}</h4>
       <p>${s.desc}</p>
       <div class="footer"><span>${hasVideo ? '<i data-lucide="film" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px"></i> Video + procedure' : '<i data-lucide="file-text" style="width:12px;height:12px;vertical-align:-2px;margin-right:3px"></i> Procedure'}</span><span>View →</span></div>
@@ -3818,7 +3857,7 @@ function renderDayDetail(view) {
   const buttonsHtml = isSubmitted ? `
     <div class="day-actions">
       <span class="submit-info">Submitted ${dayData.submittedAt ? new Date(dayData.submittedAt).toLocaleDateString() : ''}</span>
-      ${isDay9 ? `<button class="btn btn-primary" onclick="completeTraining('${ts.id}')">✓ Complete Training</button>` : ''}
+      ${isDay9 ? `<button class="btn btn-primary" onclick="completeTraining('${ts.id}')"><i data-lucide="check"></i> Complete Training</button>` : ''}
     </div>
   ` : `
     <div class="day-actions">
@@ -4786,9 +4825,9 @@ function renderAnnouncements() {
     let ackBlock = '';
     if (a.requireAck) {
       if (hasAcked) {
-        ackBlock = `<div style="margin-top:10px;padding:8px 12px;background:rgba(45,125,70,0.12);border-left:3px solid var(--ted-success);border-radius:4px;font-size:12px;color:var(--ted-success);font-weight:600">✓ You acknowledged this</div>`;
+        ackBlock = `<div style="margin-top:10px;padding:8px 12px;background:rgba(45,125,70,0.12);border-left:3px solid var(--ted-success);border-radius:4px;font-size:12px;color:var(--ted-success);font-weight:600;display:flex;align-items:center;gap:6px"><i data-lucide="check-circle" style="width:14px;height:14px"></i>You acknowledged this</div>`;
       } else {
-        ackBlock = `<div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="acknowledgeAnnouncement('${a.id}')">✓ I've read this</button></div>`;
+        ackBlock = `<div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="acknowledgeAnnouncement('${a.id}')"><i data-lucide="check"></i> I've read this</button></div>`;
       }
       if (isAdmin) {
         const total = users.length || 1;
