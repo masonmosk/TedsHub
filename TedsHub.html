@@ -338,9 +338,19 @@
     box-shadow: var(--shadow-md);
   }
   .hero::after {
-    content: "🌭"; position: absolute; right: 40px; top: 50%;
-    transform: translateY(-50%) rotate(-12deg); font-size: 140px;
-    opacity: 0.12;
+    content: ""; position: absolute; right: -20px; top: 50%;
+    transform: translateY(-50%) rotate(-6deg);
+    width: 380px; height: 380px;
+    background-image: url("./hero-tray.webp");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center right;
+    opacity: 0.22;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+  }
+  @media (max-width: 700px) {
+    .hero::after { width: 240px; height: 240px; right: -40px; opacity: 0.15; }
   }
   .hero-tag {
     font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
