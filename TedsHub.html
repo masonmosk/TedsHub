@@ -4981,11 +4981,6 @@ function initIcons() {
     try { window.lucide.createIcons(); } catch (e) { /* silent */ }
   }
 }
-// Re-run icon init after any render that injects new DOM
-const _origRenderAll = typeof renderAll === 'function' ? renderAll : null;
-if (_origRenderAll) {
-  window.renderAll = function () { _origRenderAll.apply(this, arguments); initIcons(); };
-}
 
 // ============ INIT ============
 seedDefaults();
@@ -5013,26 +5008,12 @@ if (session?.userId && users.find(u => u.id === session.userId)) {
 </script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
-  // Run initial icon replacement once Lucide loads
+  // Run initial icon replacement once Lucide loads — everything else is
+  // handled by explicit window.lucide.createIcons() calls in renderAll(),
+  // goTo(), renderAnnouncements(), and applyTheme().
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
-  // Also expose a global icon-init observer that re-runs when DOM changes in key containers
-  (function () {
-    const targets = ['main.content', 'aside.sidebar', 'header.topbar', '.modal-overlay.open'];
-    const mo = new MutationObserver(() => {
-      if (window.lucide) window.lucide.createIcons();
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-      targets.forEach(sel => {
-        document.querySelectorAll(sel).forEach(el => {
-          mo.observe(el, { childList: true, subtree: true });
-        });
-      });
-    });
-    // Observe when new modals open
-    document.addEventListener('click', () => setTimeout(() => { if (window.lucide) window.lucide.createIcons(); }, 50));
-  })();
 </script>
 </body>
 </html>
