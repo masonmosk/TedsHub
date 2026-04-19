@@ -1864,6 +1864,7 @@
       <div class="user-menu" id="userMenu">
         <div class="user-menu-item" onclick="goTo('profile')"><i data-lucide="user"></i> My Profile</div>
         <div class="user-menu-item admin-only" onclick="goTo('settings')"><i data-lucide="settings"></i> Settings</div>
+        <div class="user-menu-item" onclick="document.getElementById('userMenu').classList.remove('open');goTo('home');setTimeout(tourStart,250);"><i data-lucide="compass"></i> Take the tour</div>
         <div class="user-menu-divider"></div>
         <div class="user-menu-item" onclick="logout()"><i data-lucide="log-out"></i> Sign Out</div>
       </div>
@@ -5662,14 +5663,6 @@ try {
   try { showLogin(); } catch (_) {}
 }
 </script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-<script>
-  // Run initial icon replacement once Lucide loads — everything else is
-  // handled by explicit window.lucide.createIcons() calls in renderAll(),
-  // goTo(), renderAnnouncements(), and applyTheme().
-  if (window.lucide && typeof window.lucide.createIcons === 'function') {
-    window.lucide.createIcons();
-  }
-</script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" onload="window.lucide && window.lucide.createIcons();"></script>
 </body>
 </html>
