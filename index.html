@@ -5322,24 +5322,34 @@ if (session?.userId && users.find(u => u.id === session.userId)) {
 } else {
   showLogin();
 }
-// Hide splash once the first paint is ready (min 600ms so it's perceivable)
+// Hide splash once the first paint is ready (min 600ms so it's perceivable).
+// Uses DOMContentLoaded rather than 'load' so a hanging CDN script / image
+// can't block the splash forever. Also has a 2500ms hard-fallback.
 (function hideSplashWhenReady() {
   const splash = document.getElementById('splash');
   if (!splash) return;
-  const minShow = 600; // ms
+  const minShow = 600;
+  const hardCap = 2500;
   const start = performance.now();
+  let fired = false;
   const done = () => {
+    if (fired) return;
+    fired = true;
     const elapsed = performance.now() - start;
     const delay = Math.max(0, minShow - elapsed);
     setTimeout(() => splash.classList.add('hide'), delay);
-    // Remove from DOM after fade completes
     setTimeout(() => splash.remove(), delay + 500);
   };
-  if (document.readyState === 'complete') done();
-  else window.addEventListener('load', done, { once: true });
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+    done();
+  } else {
+    document.addEventListener('DOMContentLoaded', done, { once: true });
+  }
+  // Belt-and-suspenders: kill the splash after 2.5s no matter what
+  setTimeout(done, hardCap);
 })();
 </script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 <script>
   // Run initial icon replacement once Lucide loads — everything else is
   // handled by explicit window.lucide.createIcons() calls in renderAll(),
