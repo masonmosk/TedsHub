@@ -3245,7 +3245,10 @@ document.getElementById('signupForm').addEventListener('submit', e => {
 });
 
 function renderSignupStores() {
+  // Signup form was removed when we simplified the login; this is a no-op
+  // until/unless a signup UI comes back.
   const sel = document.getElementById('suStore');
+  if (!sel) return;
   sel.innerHTML = stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 }
 
