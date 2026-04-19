@@ -4,6 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ted's Hub — The Ted's Hot Dogs Team Portal</title>
+<meta name="description" content="Ted's Hub is the internal training & operations portal for Ted's Hotdogs — SOPs, 9-day new-hire training, documents, team directory, and announcements in one place.">
+<meta name="theme-color" content="#8B0000">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/teds-logo.png">
+<link rel="apple-touch-icon" href="/teds-logo.png">
+<link rel="shortcut icon" href="/teds-logo.png">
+
+<!-- Open Graph / Facebook / Slack / iMessage -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ted's Hub — Team Portal">
+<meta property="og:description" content="Internal training & operations hub for Ted's Hotdogs. SOPs, training, documents, directory, announcements.">
+<meta property="og:image" content="/teds-logo.png">
+<meta property="og:site_name" content="Ted's Hub">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ted's Hub — Team Portal">
+<meta name="twitter:description" content="Internal training & operations hub for Ted's Hotdogs.">
+<meta name="twitter:image" content="/teds-logo.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1621,6 +1642,66 @@
     body.demo-active #loginScreen { padding-top: 64px; }
   }
 
+  /* ============ ONBOARDING TOUR ============ */
+  .tour-overlay {
+    position: fixed; inset: 0; z-index: 1500;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    display: none;
+    animation: fadeIn var(--dur-base) var(--ease-out);
+  }
+  .tour-overlay.open { display: block; }
+  .tour-popover {
+    position: fixed; background: var(--ted-white); color: var(--ted-text);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    padding: 22px 24px; max-width: 360px;
+    z-index: 1510;
+    animation: tourPop var(--dur-base) var(--ease-out);
+  }
+  @keyframes tourPop {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .tour-popover .tour-step-num {
+    font-size: 10px; font-weight: 700; color: var(--ted-red);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px;
+  }
+  .tour-popover h3 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px; font-weight: 600; margin-bottom: 8px;
+    color: var(--ted-text);
+  }
+  .tour-popover p {
+    font-size: 13px; line-height: 1.55; color: var(--ted-muted);
+    margin-bottom: 18px;
+  }
+  .tour-popover .tour-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .tour-popover .tour-skip {
+    font-size: 12px; color: var(--ted-muted); background: none;
+    border: none; cursor: pointer; padding: 4px;
+  }
+  .tour-popover .tour-skip:hover { color: var(--ted-red); }
+  .tour-popover .tour-nav { display: flex; gap: 8px; }
+  .tour-popover .tour-dots {
+    display: flex; gap: 4px; align-items: center;
+  }
+  .tour-popover .tour-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ted-border); transition: background 0.15s;
+  }
+  .tour-popover .tour-dot.active { background: var(--ted-red); width: 20px; border-radius: 3px; }
+  .tour-highlight {
+    position: fixed; z-index: 1505; pointer-events: none;
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.55), 0 0 0 3px var(--ted-gold);
+    transition: all var(--dur-base) var(--ease-out);
+  }
+  body.dark .tour-popover { background: var(--ted-white); color: var(--ted-text); }
+
   /* ============ SPLASH SCREEN ============ */
   #splash {
     position: fixed; inset: 0; z-index: 2000;
@@ -1681,13 +1762,30 @@
   <div class="demo-banner-inner">
     <span class="demo-badge">DEMO</span>
     <span class="demo-text">
-      <strong>You're viewing an interactive demo.</strong>
-      Data is saved locally in this browser only. For a production rollout
-      with real auth, Microsoft SSO, and multi-device sync, contact Mason.
+      <strong>Interactive demo preview.</strong>
+      Data is saved locally in this browser only — production rollout includes
+      Microsoft SSO, multi-device sync, and full admin controls.
     </span>
     <button class="demo-close" onclick="dismissDemoBanner()" title="Hide banner for this session" aria-label="Dismiss">
       <i data-lucide="x"></i>
     </button>
+  </div>
+</div>
+
+<!-- ============ ONBOARDING TOUR ============ -->
+<div id="tourOverlay" class="tour-overlay" aria-hidden="true"></div>
+<div id="tourHighlight" class="tour-highlight" style="display:none"></div>
+<div id="tourPopover" class="tour-popover" style="display:none" role="dialog" aria-labelledby="tourTitle">
+  <div class="tour-step-num" id="tourStepNum">Step 1 of 4</div>
+  <h3 id="tourTitle">—</h3>
+  <p id="tourBody">—</p>
+  <div class="tour-actions">
+    <button class="tour-skip" onclick="tourSkip()">Skip tour</button>
+    <div class="tour-nav">
+      <div class="tour-dots" id="tourDots"></div>
+      <button class="btn btn-sm btn-ghost" id="tourPrev" onclick="tourPrev()" style="display:none">Back</button>
+      <button class="btn btn-sm btn-primary" id="tourNext" onclick="tourNext()">Next →</button>
+    </div>
   </div>
 </div>
 
@@ -1701,7 +1799,7 @@
     </div>
 
     <div class="demo-banner">
-      <i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"></i> <strong>Demo authentication.</strong> Users are stored in this browser only (localStorage). For real multi-device security you'd need a backend — ask Mason.
+      <i data-lucide="lock" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px"></i> <strong>Demo mode.</strong> This preview runs entirely in your browser. Multi-device sync, SSO, and production auth will be enabled on rollout.
     </div>
 
     <div id="firstRunNotice" class="first-run" style="display:none">
@@ -2203,15 +2301,22 @@
       </div>
 
       <div class="settings-pane" id="settings-danger">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Demo Controls</div>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">Quick actions for demo-mode only. The <strong>Reset Demo Data</strong> button restores the realistic seeded dataset (3 stores, 7 users, 4 announcements, 3 training sessions, activity log) so you can always get back to a clean demo state.</p>
+          <button class="btn btn-primary" onclick="resetDemoData()"><i data-lucide="refresh-ccw"></i> Reset Demo Data</button>
+        </div>
+
         <div class="card">
           <div class="card-title">Data Management</div>
-          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">All Ted's Hub data (users, stores, SOPs, checklist progress, directory) is stored locally in this browser. Use these actions to export, import, or reset.</p>
+          <p style="font-size:13px;color:var(--ted-muted);margin-bottom:14px">All Ted's Hub data (users, stores, SOPs, checklist progress, directory) is stored locally in this browser. Use these actions to export, import, or completely wipe.</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="btn btn-ghost" onclick="exportData()"><i data-lucide="download"></i> Export All Data</button>
             <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()"><i data-lucide="upload"></i> Import Data</button>
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-            <button class="btn btn-danger" onclick="resetAllData()"><i data-lucide="trash-2"></i> Reset All Data</button>
+            <button class="btn btn-danger" onclick="resetAllData()"><i data-lucide="trash-2"></i> Wipe All Data</button>
           </div>
+          <p style="font-size:11px;color:var(--ted-muted);margin-top:10px"><strong>Wipe All Data</strong> clears everything to zero (no seed). Useful for simulating a fresh org rollout.</p>
         </div>
       </div>
     </section>
@@ -3017,6 +3122,8 @@ function showApp() {
   if (!lastLogin || (Date.now() - new Date(lastLogin.ts).getTime() > 120000)) {
     logAudit('login', { role: currentUser.role, storeId: activeStoreId });
   }
+  // Kick off first-time onboarding tour (no-ops if already completed)
+  if (typeof window.__maybeStartTour === 'function') window.__maybeStartTour();
 }
 
 function applyRolePermissions() {
@@ -4628,6 +4735,8 @@ async function resetAllData() {
   if (!confirm('DELETE ALL DATA? This removes every user, store, SOP customization, contact, checklist, and uploaded file. This cannot be undone.')) return;
   if (!confirm('Really really sure?')) return;
   Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('teds-hub-audit-log');
+  localStorage.removeItem(TOUR_KEY);
   // Also wipe IndexedDB file store
   try {
     const db = await openDB();
@@ -4638,6 +4747,30 @@ async function resetAllData() {
       tx.onerror = () => rej(tx.error);
     });
   } catch (err) { console.error(err); }
+  location.reload();
+}
+
+/* Reset demo data: wipe everything + immediately reseed the realistic
+   demo dataset so Ted's can always get back to a clean, populated state. */
+async function resetDemoData() {
+  if (!confirm('Reset to clean demo data?\n\nThis wipes any changes you\'ve made (SOP edits, uploaded docs, new announcements, etc.) and restores the 3 stores, 7 users, 4 announcements, and 3 training sessions that ship with the demo.\n\nYour sign-in session will be reset — you\'ll be returned to the login screen.')) return;
+  // Clear all app state
+  Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('teds-hub-audit-log');
+  localStorage.removeItem(TOUR_KEY);
+  localStorage.removeItem(THEME_KEY);
+  sessionStorage.clear();
+  // Wipe uploaded files
+  try {
+    const db = await openDB();
+    await new Promise((res, rej) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).clear();
+      tx.oncomplete = () => res();
+      tx.onerror = () => rej(tx.error);
+    });
+  } catch (err) { console.error(err); }
+  // Reload — seedDefaults() runs on startup, repopulating everything
   location.reload();
 }
 
@@ -5314,6 +5447,145 @@ function dismissDemoBanner() {
   document.body.classList.remove('demo-active');
   sessionStorage.setItem('teds-hub-demo-dismissed', '1');
 }
+
+// ============ ONBOARDING TOUR ============
+const TOUR_KEY = 'teds-hub-tour-completed';
+const TOUR_STEPS = [
+  {
+    target: 'aside.sidebar',
+    title: 'This is your navigation',
+    body: 'Use the sidebar to jump between SOPs, documents, training, the team directory, and more. Admins also see a Settings section here.',
+    placement: 'right',
+  },
+  {
+    target: '#announcementsList, .announcements-board',
+    title: 'Announcements live here',
+    body: 'Managers and admins post team-wide announcements. Critical ones can require an "I\'ve read this" acknowledgment so admins can see who has and hasn\'t checked in.',
+    placement: 'bottom',
+  },
+  {
+    target: '.nav-item[data-page="sops"]',
+    title: 'Every SOP in one place',
+    body: 'Searchable, filterable, and editable by managers. Each SOP can have a procedure body, a video walkthrough, and a category so the team can find what they need fast.',
+    placement: 'right',
+  },
+  {
+    target: '.user-chip',
+    title: 'Your profile + sign out',
+    body: 'Click here any time to update your info, toggle dark mode from the top bar, or sign out. Ready to explore on your own?',
+    placement: 'bottom',
+  },
+];
+let tourIndex = 0;
+
+function shouldRunTour() {
+  return !localStorage.getItem(TOUR_KEY) && currentUser;
+}
+
+function tourStart() {
+  tourIndex = 0;
+  document.getElementById('tourOverlay').classList.add('open');
+  tourShowStep();
+}
+
+function tourShowStep() {
+  const step = TOUR_STEPS[tourIndex];
+  if (!step) { tourFinish(); return; }
+
+  const target = document.querySelector(step.target);
+  const highlight = document.getElementById('tourHighlight');
+  const popover = document.getElementById('tourPopover');
+
+  // Position the highlight rectangle over the target
+  if (target) {
+    const r = target.getBoundingClientRect();
+    const pad = 6;
+    highlight.style.display = 'block';
+    highlight.style.left = (r.left - pad) + 'px';
+    highlight.style.top = (r.top - pad) + 'px';
+    highlight.style.width = (r.width + pad * 2) + 'px';
+    highlight.style.height = (r.height + pad * 2) + 'px';
+  } else {
+    highlight.style.display = 'none';
+  }
+
+  // Fill popover content
+  document.getElementById('tourStepNum').textContent = `Step ${tourIndex + 1} of ${TOUR_STEPS.length}`;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourBody').textContent = step.body;
+  document.getElementById('tourPrev').style.display = tourIndex > 0 ? 'inline-flex' : 'none';
+  document.getElementById('tourNext').textContent = tourIndex === TOUR_STEPS.length - 1 ? 'Finish ✓' : 'Next →';
+
+  // Render dots
+  const dots = document.getElementById('tourDots');
+  dots.innerHTML = TOUR_STEPS.map((_, i) =>
+    `<div class="tour-dot${i === tourIndex ? ' active' : ''}"></div>`
+  ).join('');
+
+  // Position the popover relative to the target
+  popover.style.display = 'block';
+  const pRect = popover.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let left, top;
+
+  if (target) {
+    const r = target.getBoundingClientRect();
+    const margin = 18;
+    if (step.placement === 'right' && r.right + margin + pRect.width < vw) {
+      left = r.right + margin;
+      top = r.top;
+    } else if (step.placement === 'bottom' && r.bottom + margin + pRect.height < vh) {
+      left = Math.min(r.left, vw - pRect.width - 20);
+      top = r.bottom + margin;
+    } else {
+      // fallback centered at bottom
+      left = Math.max(20, (vw - pRect.width) / 2);
+      top = vh - pRect.height - 40;
+    }
+  } else {
+    left = (vw - pRect.width) / 2;
+    top = (vh - pRect.height) / 2;
+  }
+  // Clamp to viewport
+  left = Math.max(16, Math.min(left, vw - pRect.width - 16));
+  top = Math.max(16, Math.min(top, vh - pRect.height - 16));
+  popover.style.left = left + 'px';
+  popover.style.top = top + 'px';
+}
+
+function tourNext() {
+  if (tourIndex < TOUR_STEPS.length - 1) {
+    tourIndex++;
+    tourShowStep();
+  } else {
+    tourFinish();
+  }
+}
+function tourPrev() {
+  if (tourIndex > 0) { tourIndex--; tourShowStep(); }
+}
+function tourSkip() { tourFinish(); }
+function tourFinish() {
+  document.getElementById('tourOverlay').classList.remove('open');
+  document.getElementById('tourPopover').style.display = 'none';
+  document.getElementById('tourHighlight').style.display = 'none';
+  localStorage.setItem(TOUR_KEY, '1');
+}
+
+// Auto-run on first login (after showApp settles)
+window.__maybeStartTour = function () {
+  if (shouldRunTour()) {
+    setTimeout(tourStart, 600);
+  }
+};
+
+// Reposition on resize
+window.addEventListener('resize', () => {
+  if (document.getElementById('tourOverlay').classList.contains('open')) {
+    tourShowStep();
+  }
+});
 
 // ============ SPLASH HIDE (registered first so errors in init can't block it) ============
 (function hideSplashWhenReady() {

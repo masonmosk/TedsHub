@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — The grill's cold | Ted's Hub</title>
+<meta name="description" content="Page not found on Ted's Hub.">
+<meta name="theme-color" content="#8B0000">
+<link rel="icon" type="image/png" href="/teds-logo.png">
+<link rel="apple-touch-icon" href="/teds-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: white;
+    background: linear-gradient(135deg, #6B0000 0%, #8B0000 50%, #C8102E 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; min-height: 100vh; text-align: center;
+    position: relative; overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 25%, rgba(232,166,40,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .wrap {
+    position: relative; z-index: 1; max-width: 560px;
+    animation: rise 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .logo-img {
+    width: 120px; height: auto; margin: 0 auto 24px;
+    display: block; filter: drop-shadow(0 4px 20px rgba(0,0,0,0.3));
+  }
+  .code {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 100px; letter-spacing: 6px; line-height: 1;
+    color: #E8A628; margin-bottom: 8px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px; letter-spacing: 2px; line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  p {
+    font-size: 15px; line-height: 1.55; opacity: 0.92;
+    max-width: 440px; margin: 0 auto 28px;
+  }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 8px;
+    background: #E8A628; color: #6B0000;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .home-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+  }
+  .home-btn:active { transform: translateY(0); }
+  .footnote {
+    margin-top: 36px; font-size: 12px; opacity: 0.7;
+    letter-spacing: 0.3px;
+  }
+  .footnote code {
+    background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 3px;
+    font-family: 'Menlo', monospace; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <img class="logo-img" src="/teds-logo.png" alt="Ted's Hotdogs">
+    <div class="code">404</div>
+    <h1>The Grill Won't Turn On</h1>
+    <p>
+      Looks like whatever you were looking for isn't on the menu. Maybe
+      the link is old, or the tray got cleared. Let's get you back to a
+      hot one.
+    </p>
+    <a href="/" class="home-btn">← Back to Ted's Hub</a>
+    <div class="footnote">
+      Still can't find it? <code id="req-path"></code>
+    </div>
+  </div>
+  <script>
+    // Show the requested path so whoever sent the link can debug
+    try {
+      const p = location.pathname;
+      if (p && p !== '/') document.getElementById('req-path').textContent = p;
+      else document.getElementById('req-path').remove();
+    } catch (e) {}
+  </script>
+</body>
+</html>
