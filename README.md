@@ -5,7 +5,7 @@ SOPs, 9-day new-hire training, document library, team directory,
 announcements (with required-read tracking), auto-email system,
 role-based admin, and more.
 
-Single-file HTML demo (`TedsHub.html`) — no backend yet. All data is
+Single-file HTML demo (`index.html`) — no backend yet. All data is
 currently stored in the browser (localStorage + IndexedDB for file
 uploads). The production rollout will replace that storage layer with
 Supabase + real auth, without changing the UI.
@@ -158,7 +158,7 @@ Desktop). Roadmap lives there in detail.
 ```bash
 # From the project root
 npx serve -l 4321 .
-# Then open http://localhost:4321/TedsHub.html
+# Then open http://localhost:4321
 ```
 
 No build step. No dependencies to install. Pure static HTML.
