@@ -1,0 +1,20 @@
+# Files that should NOT be deployed to Vercel
+
+# Claude Code + local tooling
+.claude/
+.DS_Store
+*.swp
+
+# Source/archival PDFs — shouldn't be publicly downloadable from the site
+# (If Ted's wants to serve PDFs later, migrate to Supabase Storage where
+# they're access-controlled.)
+*.pdf
+"Ted's New Hire Team Member Training Guide.pdf"
+
+# Internal notes / local-only files
+*.local
+/private/
+/tmp/
+
+# OS junk
+Thumbs.db
