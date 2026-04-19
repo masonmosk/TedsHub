@@ -5315,16 +5315,7 @@ function dismissDemoBanner() {
   sessionStorage.setItem('teds-hub-demo-dismissed', '1');
 }
 
-// ============ INIT ============
-seedDefaults();
-if (session?.userId && users.find(u => u.id === session.userId)) {
-  showApp();
-} else {
-  showLogin();
-}
-// Hide splash once the first paint is ready (min 600ms so it's perceivable).
-// Uses DOMContentLoaded rather than 'load' so a hanging CDN script / image
-// can't block the splash forever. Also has a 2500ms hard-fallback.
+// ============ SPLASH HIDE (registered first so errors in init can't block it) ============
 (function hideSplashWhenReady() {
   const splash = document.getElementById('splash');
   if (!splash) return;
@@ -5348,6 +5339,20 @@ if (session?.userId && users.find(u => u.id === session.userId)) {
   // Belt-and-suspenders: kill the splash after 2.5s no matter what
   setTimeout(done, hardCap);
 })();
+
+// ============ INIT ============
+try {
+  seedDefaults();
+  if (session?.userId && users.find(u => u.id === session.userId)) {
+    showApp();
+  } else {
+    showLogin();
+  }
+} catch (err) {
+  console.error('Init failed:', err);
+  // Fall back to the login screen so the user can at least see something
+  try { showLogin(); } catch (_) {}
+}
 </script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
 <script>
